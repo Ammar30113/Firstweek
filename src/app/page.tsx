@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   SAMPLE_JOB_TITLE,
   SAMPLE_JOB_DESCRIPTION,
@@ -16,11 +17,14 @@ import type {
   Report,
 } from "@/lib/schemas";
 import type { AssessmentScore } from "@/lib/scoring";
+import { Card, Chip, H, impTone } from "@/components/ui";
+import { ReportView } from "@/components/report-view";
 
 type Phase = "input" | "analysis" | "simulation" | "report";
 type Loading = null | "analyzing" | "simulating" | "evaluating";
 
 interface Analysis {
+  assessmentId: string;
   job: JobAnalysis;
   candidate: CandidateProfile;
   match: RoleMatch;
@@ -87,10 +91,7 @@ export default function Home() {
     setLoading("simulating");
     try {
       const data = await postJSON<{ tasks: SimulationTask[] }>("/api/assessment/simulate", {
-        job: analysis.job,
-        candidate: analysis.candidate,
-        match: analysis.match,
-        task_count: 3,
+        assessmentId: analysis.assessmentId,
       });
       setTasks(data.tasks);
       setResponses(new Array(data.tasks.length).fill(""));
@@ -108,13 +109,8 @@ export default function Home() {
     setLoading("evaluating");
     try {
       const data = await postJSON<EvaluateResp>("/api/assessment/evaluate", {
-        job: analysis.job,
-        candidate: analysis.candidate,
-        match: analysis.match,
-        tasks,
+        assessmentId: analysis.assessmentId,
         responses,
-        job_description: jobText,
-        resume_text: resumeText,
       });
       setResult(data);
       setPhase("report");
@@ -139,13 +135,10 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-8">
-      <header className="no-print mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">FirstWeek</h1>
-          <p className="text-sm text-slate-500">Simulate the job before you apply.</p>
-        </div>
+      <div className="no-print mb-8 flex items-center justify-between">
+        <p className="text-sm text-slate-500">Simulate the job before you apply.</p>
         <Stepper phase={phase} />
-      </header>
+      </div>
 
       {error && (
         <div className="no-print mb-6 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -191,7 +184,20 @@ export default function Home() {
       )}
 
       {phase === "report" && result && (
-        <ReportView result={result} onReset={reset} />
+        <div className="space-y-5">
+          <div className="no-print flex items-center justify-between">
+            <button
+              onClick={reset}
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              ← Start another simulation
+            </button>
+            <Link href="/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
+              View all assessments →
+            </Link>
+          </div>
+          <ReportView report={result.report} perTask={result.score.perTask} />
+        </div>
       )}
 
       <footer className="no-print mt-12 border-t border-slate-200 pt-4 text-xs text-slate-400">
@@ -228,29 +234,6 @@ function Stepper({ phase }: { phase: Phase }) {
   );
 }
 
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={"rounded-xl border border-slate-200 bg-white p-5 shadow-sm " + className}>
-      {children}
-    </div>
-  );
-}
-
-function Chip({ children, tone = "slate" }: { children: React.ReactNode; tone?: string }) {
-  const tones: Record<string, string> = {
-    slate: "bg-slate-100 text-slate-700",
-    blue: "bg-blue-100 text-blue-700",
-    rose: "bg-rose-100 text-rose-700",
-    amber: "bg-amber-100 text-amber-700",
-    emerald: "bg-emerald-100 text-emerald-700",
-  };
-  return (
-    <span className={"inline-block rounded-full px-2.5 py-0.5 text-xs font-medium " + tones[tone]}>
-      {children}
-    </span>
-  );
-}
-
 function Button({
   children,
   onClick,
@@ -273,23 +256,6 @@ function Button({
       {children}
     </button>
   );
-}
-
-function H({ children }: { children: React.ReactNode }) {
-  return <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">{children}</h3>;
-}
-
-function impTone(importance: string) {
-  if (importance === "critical") return "rose";
-  if (importance === "important") return "amber";
-  return "slate";
-}
-
-function bandTone(band: string) {
-  if (band === "Excellent Fit" || band === "Strong Fit") return "emerald";
-  if (band === "Viable Fit") return "blue";
-  if (band === "Stretch Role") return "amber";
-  return "rose";
 }
 
 /* ----------------------------------------------------------------- input */
@@ -395,6 +361,7 @@ function AnalysisView({
           </div>
           {job.hidden_expectations.length > 0 && (
             <>
+              <div className="mt-3" />
               <H>Hidden expectations</H>
               <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
                 {job.hidden_expectations.slice(0, 4).map((r, i) => (
@@ -527,135 +494,6 @@ function SimulationView({
           {answered} of {tasks.length} answered
         </span>
       </div>
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------------- report */
-
-function ReportView({ result, onReset }: { result: EvaluateResp; onReset: () => void }) {
-  const { report, score } = result;
-  const tone = bandTone(report.readiness_band);
-  const ringColor: Record<string, string> = {
-    emerald: "border-emerald-500 text-emerald-600",
-    blue: "border-blue-500 text-blue-600",
-    amber: "border-amber-500 text-amber-600",
-    rose: "border-rose-500 text-rose-600",
-  };
-
-  return (
-    <div className="space-y-5">
-      <div className="no-print flex items-center justify-between">
-        <Button variant="ghost" onClick={onReset}>
-          ← Start another simulation
-        </Button>
-        <Button variant="ghost" onClick={() => window.print()}>
-          Print / save PDF
-        </Button>
-      </div>
-
-      <Card className="print-clean">
-        <div className="flex items-center gap-6">
-          <div
-            className={
-              "flex h-28 w-28 flex-none flex-col items-center justify-center rounded-full border-4 " +
-              ringColor[tone]
-            }
-          >
-            <span className="text-3xl font-extrabold">{report.overall_score}</span>
-            <span className="text-xs text-slate-400">/ 100</span>
-          </div>
-          <div>
-            <div className="mb-1 flex flex-wrap items-center gap-2">
-              <Chip tone={tone}>{report.readiness_band}</Chip>
-              <Chip>Confidence: {report.confidence_level}</Chip>
-            </div>
-            <p className="text-sm text-slate-700">{report.application_recommendation}</p>
-          </div>
-        </div>
-      </Card>
-
-      <Card className="print-clean">
-        <H>Task scores</H>
-        <div className="space-y-3">
-          {score.perTask.map((t, i) => (
-            <div key={i}>
-              <div className="mb-1 flex items-center justify-between text-sm">
-                <span className="text-slate-700">{t.taskTitle}</span>
-                <span className="font-semibold">{t.score}</span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-blue-500"
-                  style={{ width: `${t.score}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <div className="grid gap-5 md:grid-cols-2">
-        <Card className="print-clean">
-          <H>Strengths demonstrated</H>
-          <ul className="space-y-2 text-sm text-slate-700">
-            {report.strengths_demonstrated.map((s, i) => (
-              <li key={i}>
-                <span className="font-medium">{s.strength}</span> — {s.relevance_to_role}
-              </li>
-            ))}
-          </ul>
-        </Card>
-        <Card className="print-clean">
-          <H>Skill gaps</H>
-          <ul className="space-y-2 text-sm text-slate-700">
-            {report.skill_gaps.map((g, i) => (
-              <li key={i}>
-                <span className="font-medium">{g.gap}</span>{" "}
-                <Chip tone={impTone(g.importance_for_role)}>{g.importance_for_role}</Chip>
-                <div className="text-slate-500">{g.recommendation}</div>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-
-      <Card className="print-clean">
-        <H>Recommended learning path</H>
-        <ul className="space-y-2 text-sm text-slate-700">
-          {report.recommended_learning_path.map((l, i) => (
-            <li key={i} className="flex flex-wrap items-center gap-2">
-              <Chip tone={l.priority === "high" ? "rose" : l.priority === "medium" ? "amber" : "slate"}>
-                {l.priority}
-              </Chip>
-              <span className="font-medium">{l.skill}</span>
-              <span className="text-slate-500">— {l.resource} ({l.timeframe})</span>
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      <Card className="print-clean">
-        <H>Interview prep focus</H>
-        <ul className="space-y-2 text-sm text-slate-700">
-          {report.interview_prep_focus.map((p, i) => (
-            <li key={i}>
-              <span className="font-medium">{p.topic}</span> — {p.why}
-              <div className="text-slate-500">Tip: {p.preparation_tip}</div>
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      <Card className="print-clean">
-        <H>Hiring manager summary</H>
-        <p className="text-sm text-slate-700">{report.hiring_manager_summary}</p>
-        <p className="mt-2 text-sm text-slate-600">
-          <span className="font-medium">Learning curve:</span> {report.learning_curve_estimate}
-        </p>
-      </Card>
-
-      <p className="px-1 text-xs italic text-slate-400">{report.disclaimer}</p>
     </div>
   );
 }
