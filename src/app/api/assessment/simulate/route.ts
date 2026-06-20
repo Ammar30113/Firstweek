@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { generateSimulation } from "@/lib/ai/stages";
 import { badRequest, serverError } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
-import { runAiStage } from "@/lib/db/ai-log";
+import { aiContext } from "@/lib/ai/context";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -42,9 +42,8 @@ export async function POST(req: Request) {
     const match = assess.role_match_json;
     if (!job || !candidate || !match) return badRequest("assessment is missing analysis data");
 
-    const tasks = await runAiStage("simulation_generation", { userId: user.id, assessmentId }, () =>
-      generateSimulation(job, candidate, match, 3)
-    );
+    aiContext.enterWith({ userId: user.id, assessmentId });
+    const tasks = await generateSimulation(job, candidate, match, 3);
 
     // Idempotent: clear any prior tasks before inserting this set.
     await supabase.from("simulation_tasks").delete().eq("assessment_id", assessmentId);

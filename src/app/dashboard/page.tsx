@@ -19,7 +19,7 @@ export default async function DashboardPage() {
         <h1 className="text-xl font-bold">Your assessments</h1>
         <Link
           href="/"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
         >
           New assessment
         </Link>
@@ -27,9 +27,9 @@ export default async function DashboardPage() {
 
       {rows.length === 0 ? (
         <Card>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-stone-600">
             No assessments yet.{" "}
-            <Link href="/" className="text-blue-600 hover:underline">
+            <Link href="/" className="text-brand-600 hover:underline">
               Run your first one →
             </Link>
           </p>
@@ -39,11 +39,11 @@ export default async function DashboardPage() {
           {rows.map((a) => {
             const done = a.status === "completed";
             const card = (
-              <Card className={done ? "transition hover:border-blue-300" : ""}>
+              <Card className={done ? "transition hover:border-brand-300" : ""}>
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="font-semibold">{a.job_title || "Untitled role"}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-stone-400">
                       {new Date(a.created_at).toLocaleString()}
                     </p>
                   </div>

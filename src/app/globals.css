@@ -1,11 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
+
+/* Warm & human design system: stone neutrals + a terracotta brand. */
+@theme {
+  --color-brand-50: #fdf4f0;
+  --color-brand-100: #fbe7dd;
+  --color-brand-200: #f6cab5;
+  --color-brand-300: #efa687;
+  --color-brand-400: #e67d57;
+  --color-brand-500: #dd5d35;
+  --color-brand-600: #c8472a;
+  --color-brand-700: #a63a24;
+  --color-brand-800: #883122;
+  --color-brand-900: #702c20;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
 
 :root {
   color-scheme: light;
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-stone-50 text-stone-900 antialiased;
+  font-family: var(--font-sans);
 }
 
 /* Print: hide app chrome, show only the report */

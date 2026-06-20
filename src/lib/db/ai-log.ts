@@ -1,44 +1,35 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { modelForStep } from "@/lib/ai/client";
 
-/**
- * Times an AI stage and writes a best-effort row to ai_logs (service-role).
- * Logging never blocks or fails the request.
- */
-export async function runAiStage<T>(
-  step: string,
-  ctx: { userId?: string | null; assessmentId?: string | null },
-  thunk: () => Promise<T>
-): Promise<T> {
-  const start = Date.now();
-  try {
-    const result = await thunk();
-    void writeLog(step, ctx, Date.now() - start, null);
-    return result;
-  } catch (err) {
-    void writeLog(step, ctx, Date.now() - start, err instanceof Error ? err.message : String(err));
-    throw err;
-  }
+export interface AiLogEntry {
+  step: string;
+  model: string;
+  durationMs: number;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+  costUsd?: number | null;
+  error?: string | null;
+  userId?: string | null;
+  assessmentId?: string | null;
 }
 
-async function writeLog(
-  step: string,
-  ctx: { userId?: string | null; assessmentId?: string | null },
-  durationMs: number,
-  error: string | null
-) {
+// Best-effort write to ai_logs (service-role). Never throws — logging must not
+// break or slow-fail a request.
+export async function logAiCall(e: AiLogEntry): Promise<void> {
   try {
     await createAdminClient()
       .from("ai_logs")
       .insert({
-        user_id: ctx.userId ?? null,
-        assessment_id: ctx.assessmentId ?? null,
-        step_name: step,
-        model: modelForStep(step),
-        duration_ms: durationMs,
-        error,
+        user_id: e.userId ?? null,
+        assessment_id: e.assessmentId ?? null,
+        step_name: e.step,
+        model: e.model,
+        duration_ms: e.durationMs,
+        prompt_tokens: e.promptTokens ?? null,
+        completion_tokens: e.completionTokens ?? null,
+        cost_usd: e.costUsd ?? null,
+        error: e.error ?? null,
       });
   } catch {
-    // best-effort only
+    // swallow — best-effort
   }
 }

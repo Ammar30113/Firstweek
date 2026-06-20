@@ -9,7 +9,7 @@ import {
 import { scoreAssessment } from "@/lib/scoring";
 import { badRequest, serverError } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
-import { runAiStage } from "@/lib/db/ai-log";
+import { aiContext } from "@/lib/ai/context";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -58,12 +58,10 @@ export async function POST(req: Request) {
 
     const tasks: SimulationTask[] = taskRows.map((r) => r.task_json as SimulationTask);
 
+    aiContext.enterWith({ userId: user.id, assessmentId });
+
     const evaluations: Evaluation[] = await Promise.all(
-      tasks.map((task, i) =>
-        runAiStage("task_evaluation", { userId: user.id, assessmentId }, () =>
-          evaluateTask(task, responses[i] || "")
-        )
-      )
+      tasks.map((task, i) => evaluateTask(task, responses[i] || ""))
     );
 
     const job = jobRow?.analysis_json;
@@ -101,21 +99,19 @@ export async function POST(req: Request) {
       if (eErr) throw eErr;
     }
 
-    const reportBody = await runAiStage("report_generation", { userId: user.id, assessmentId }, () =>
-      generateReport({
-        candidate,
-        job,
-        match: assess.role_match_json,
-        evaluations: tasks.map((task, i) => ({
-          task,
-          evaluation: evaluations[i],
-          score: score.perTask[i].score,
-        })),
-        overallScore: score.overall,
-        readinessBand: score.band,
-        confidenceLevel: score.confidence,
-      })
-    );
+    const reportBody = await generateReport({
+      candidate,
+      job,
+      match: assess.role_match_json,
+      evaluations: tasks.map((task, i) => ({
+        task,
+        evaluation: evaluations[i],
+        score: score.perTask[i].score,
+      })),
+      overallScore: score.overall,
+      readinessBand: score.band,
+      confidenceLevel: score.confidence,
+    });
 
     const report: Report = {
       ...reportBody,

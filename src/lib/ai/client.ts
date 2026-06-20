@@ -1,10 +1,9 @@
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type { z } from "zod";
+import { logAiCall } from "@/lib/db/ai-log";
+import { aiContext } from "@/lib/ai/context";
 
-// Base model for extraction/structuring stages (cheap, fast). Quality model for
-// the stages where scoring credibility + polish matter most (evaluation, report).
-// Both overridable via env — set them equal to go all-cheap or all-premium.
 // NOTE: this OpenAI project currently has no access to the gpt-4.1 family (403),
 // so we default to the gpt-4o tier. Switch these to gpt-4.1-mini / gpt-4.1 once
 // the project is granted access (cheaper for equal/better quality).
@@ -25,27 +24,33 @@ export function modelForStep(step: string): string {
   return STAGE_MODEL[step] || BASE_MODEL;
 }
 
+// USD per 1M tokens: [input, output]. Used to estimate per-call cost.
+const PRICES: Record<string, [number, number]> = {
+  "gpt-4o": [2.5, 10],
+  "gpt-4o-mini": [0.15, 0.6],
+  "gpt-4.1": [2, 8],
+  "gpt-4.1-mini": [0.4, 1.6],
+  "gpt-4.1-nano": [0.1, 0.4],
+};
+
+export function costUsd(model: string, promptTokens: number, completionTokens: number): number | null {
+  const p = PRICES[model];
+  if (!p) return null;
+  return +((promptTokens / 1e6) * p[0] + (completionTokens / 1e6) * p[1]).toFixed(6);
+}
+
 let _client: OpenAI | null = null;
 function client(): OpenAI {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error(
-      "OPENAI_API_KEY is not set. Copy .env.example to .env.local and add your key."
-    );
+    throw new Error("OPENAI_API_KEY is not set. Copy .env.example to .env.local and add your key.");
   }
   if (!_client) _client = new OpenAI({ apiKey });
   return _client;
 }
 
 function errMessage(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  return String(err);
-}
-
-function logCall(step: string, model: string, durationMs: number, err: unknown, attempt: number) {
-  const base = { step, model, duration_ms: durationMs, attempt };
-  if (err) console.error("[ai]", { ...base, error: errMessage(err) });
-  else console.info("[ai]", { ...base, ok: true });
+  return err instanceof Error ? err.message : String(err);
 }
 
 interface CallArgs<T> {
@@ -56,17 +61,19 @@ interface CallArgs<T> {
   schemaName: string;
   temperature?: number;
   maxTokens?: number;
-  model?: string; // override; defaults to the per-stage routed model
+  model?: string;
 }
 
 /**
- * Single entry point for every AI stage. Uses OpenAI Structured Outputs so the
- * response is guaranteed to match `schema`; retries once on failure. The model
- * is routed per stage (see STAGE_MODEL) unless explicitly overridden.
+ * Single entry point for every AI stage. Structured Outputs guarantees the
+ * response matches `schema`; retries once on failure. Logs each call to
+ * ai_logs with token usage + estimated cost, attributed to the request's
+ * user/assessment via AsyncLocalStorage.
  */
 export async function callStructured<T>(args: CallArgs<T>): Promise<T> {
   const { step, system, user, schema, schemaName, temperature = 0.3, maxTokens = 4096 } = args;
   const model = args.model || modelForStep(step);
+  const ctx = aiContext.getStore();
 
   let lastErr: unknown;
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -84,17 +91,40 @@ export async function callStructured<T>(args: CallArgs<T>): Promise<T> {
       });
 
       const choice = completion.choices[0];
-      if (choice?.message.refusal) {
-        throw new Error(`Model refused the request: ${choice.message.refusal}`);
-      }
+      if (choice?.message.refusal) throw new Error(`Model refused the request: ${choice.message.refusal}`);
       const parsed = choice?.message.parsed;
       if (!parsed) throw new Error("Model returned no parsed output.");
 
-      logCall(step, model, Date.now() - start, null, attempt);
+      const pt = completion.usage?.prompt_tokens ?? 0;
+      const ct = completion.usage?.completion_tokens ?? 0;
+      const durationMs = Date.now() - start;
+      console.info("[ai]", { step, model, durationMs, prompt_tokens: pt, completion_tokens: ct });
+      await logAiCall({
+        step,
+        model,
+        durationMs,
+        promptTokens: pt,
+        completionTokens: ct,
+        costUsd: costUsd(model, pt, ct),
+        error: null,
+        userId: ctx?.userId,
+        assessmentId: ctx?.assessmentId,
+      });
       return parsed;
     } catch (err) {
       lastErr = err;
-      logCall(step, model, Date.now() - start, err, attempt);
+      const durationMs = Date.now() - start;
+      console.error("[ai]", { step, model, durationMs, attempt, error: errMessage(err) });
+      if (attempt === 2) {
+        await logAiCall({
+          step,
+          model,
+          durationMs,
+          error: errMessage(err),
+          userId: ctx?.userId,
+          assessmentId: ctx?.assessmentId,
+        });
+      }
     }
   }
   throw new Error(`AI step "${step}" failed after retry: ${errMessage(lastErr)}`);

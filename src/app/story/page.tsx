@@ -42,47 +42,47 @@ export default function StoryPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
       <header className="mb-12">
-        <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-600">
+        <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-brand-600">
           Why FirstWeek exists
         </p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+        <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
           You can do the job. The hard part is believing it.
         </h1>
-        <p className="mt-3 text-lg text-slate-600">
+        <p className="mt-3 text-lg text-stone-600">
           FirstWeek was built by someone who second-guessed himself out of roles he could do.
           Here&apos;s the story.
         </p>
       </header>
 
-      <ol className="relative space-y-8 border-l-2 border-slate-200 pl-8">
+      <ol className="relative space-y-8 border-l-2 border-stone-200 pl-8">
         {PANELS.map((p) => (
           <li key={p.n} className="relative">
-            <span className="absolute -left-[2.6rem] flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+            <span className="absolute -left-[2.6rem] flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
               {p.n}
             </span>
-            <h2 className="text-lg font-bold text-slate-900">{p.title}</h2>
-            <p className="mt-1 text-slate-700">{p.body}</p>
+            <h2 className="text-lg font-bold text-stone-900">{p.title}</h2>
+            <p className="mt-1 text-stone-700">{p.body}</p>
           </li>
         ))}
       </ol>
 
-      <p className="mt-10 text-right text-sm font-medium text-slate-500">— Ammar</p>
+      <p className="mt-10 text-right text-sm font-medium text-stone-500">— Ammar</p>
 
-      <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <h3 className="text-xl font-bold text-slate-900">You can do the job. Let&apos;s prove it.</h3>
-        <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+      <div className="mt-12 rounded-2xl border border-stone-200 bg-white p-8 text-center shadow-sm">
+        <h3 className="text-xl font-bold text-stone-900">You can do the job. Let&apos;s prove it.</h3>
+        <p className="mx-auto mt-2 max-w-md text-sm text-stone-600">
           Paste a job posting, do the real work it would involve, and walk into the interview
           knowing you&apos;ve already done it.
         </p>
         <Link
           href="/"
-          className="mt-5 inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="mt-5 inline-block rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
           Start your simulation
         </Link>
       </div>
 
-      <footer className="mt-10 border-t border-slate-200 pt-4 text-xs text-slate-400">
+      <footer className="mt-10 border-t border-stone-200 pt-4 text-xs text-stone-400">
         FirstWeek produces a simulation-based readiness estimate for self-assessment. It does not
         guarantee employment outcomes.
       </footer>

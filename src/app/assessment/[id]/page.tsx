@@ -44,7 +44,7 @@ export default async function AssessmentReportPage({
   return (
     <div className="mx-auto max-w-4xl px-5 py-8">
       <div className="no-print mb-4">
-        <Link href="/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
+        <Link href="/dashboard" className="text-sm font-medium text-brand-600 hover:underline">
           ← Back to dashboard
         </Link>
       </div>
