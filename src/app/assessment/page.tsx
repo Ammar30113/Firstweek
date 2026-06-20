@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   SAMPLE_JOB_TITLE,
@@ -18,6 +18,7 @@ import type {
 } from "@/lib/schemas";
 import type { AssessmentScore } from "@/lib/scoring";
 import { Card, Chip, H, Button, impTone } from "@/components/ui";
+import { LoadingProgress } from "@/components/visuals";
 import { ReportView } from "@/components/report-view";
 
 type Phase = "input" | "analysis" | "simulation" | "report";
@@ -34,6 +35,15 @@ interface EvaluateResp {
   score: AssessmentScore;
   report: Report;
 }
+
+const ANALYZE_STEPS = ["Reading the job posting", "Profiling your experience", "Mapping your fit to the role"];
+const SIMULATE_STEPS = ["Designing realistic tasks for this role", "Writing scoring rubrics", "Finalizing your simulation"];
+const EVAL_STEPS = [
+  "Reading your responses",
+  "Scoring against each rubric",
+  "Weighing strengths and gaps",
+  "Writing your readiness report",
+];
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
@@ -52,6 +62,9 @@ const STEPS: { key: Phase; label: string }[] = [
   { key: "simulation", label: "Simulation" },
   { key: "report", label: "Report" },
 ];
+
+const textareaCls =
+  "w-full resize-y rounded-xl border border-stone-200 p-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export default function AssessmentPage() {
   const [phase, setPhase] = useState<Phase>("input");
@@ -216,7 +229,7 @@ function Stepper({ phase }: { phase: Phase }) {
           >
             {i + 1}
           </span>
-          <span className={i === activeIdx ? "font-semibold text-stone-900" : "text-stone-400"}>
+          <span className={"hidden sm:inline " + (i === activeIdx ? "font-semibold text-stone-900" : "text-stone-400")}>
             {s.label}
           </span>
           {i < STEPS.length - 1 && <span className="text-stone-300">→</span>}
@@ -225,9 +238,6 @@ function Stepper({ phase }: { phase: Phase }) {
     </ol>
   );
 }
-
-const textareaCls =
-  "w-full resize-y rounded-xl border border-stone-200 p-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 /* ----------------------------------------------------------------- input */
 
@@ -259,20 +269,21 @@ function InputView({
       <div className="grid gap-5 md:grid-cols-2">
         <Card>
           <H>Job description</H>
-          <textarea value={jobText} onChange={(e) => onJob(e.target.value)} rows={16} className={textareaCls} />
+          <textarea value={jobText} onChange={(e) => onJob(e.target.value)} rows={15} className={textareaCls} />
         </Card>
         <Card>
           <H>Your resume / profile</H>
-          <textarea value={resumeText} onChange={(e) => onResume(e.target.value)} rows={16} className={textareaCls} />
+          <textarea value={resumeText} onChange={(e) => onResume(e.target.value)} rows={15} className={textareaCls} />
         </Card>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Button onClick={onRun} disabled={loading || !jobText.trim() || !resumeText.trim()}>
-          {loading ? "Analyzing… (~15s)" : "Run analysis"}
+      {loading ? (
+        <LoadingProgress steps={ANALYZE_STEPS} note="Usually about 15 seconds." />
+      ) : (
+        <Button onClick={onRun} disabled={!jobText.trim() || !resumeText.trim()}>
+          Run analysis
         </Button>
-        {loading && <span className="text-sm text-stone-500">Extracting role + profile…</span>}
-      </div>
+      )}
     </div>
   );
 }
@@ -374,19 +385,21 @@ function AnalysisView({
         </div>
       </Card>
 
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button onClick={onNext} disabled={loading}>
-          {loading ? "Generating tasks… (~20s)" : "Generate simulation"}
-        </Button>
-      </div>
+      {loading ? (
+        <LoadingProgress steps={SIMULATE_STEPS} note="Usually about 20 seconds." />
+      ) : (
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" onClick={onBack}>
+            Back
+          </Button>
+          <Button onClick={onNext}>Generate simulation</Button>
+        </div>
+      )}
     </div>
   );
 }
 
-/* ------------------------------------------------------------ simulation */
+/* ----------------------------------------------------- simulation workspace */
 
 function SimulationView({
   tasks,
@@ -403,55 +416,136 @@ function SimulationView({
   onChange: (i: number, v: string) => void;
   onSubmit: () => void;
 }) {
-  const allAnswered = answered === tasks.length && tasks.length > 0;
-  return (
-    <div className="space-y-5">
-      <Card>
-        <p className="text-sm text-stone-600">
-          Complete each task as you would on the job. Your answers are evaluated against a
-          role-specific rubric — there are no trick questions.
-        </p>
-      </Card>
+  const [current, setCurrent] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
 
-      {tasks.map((task, i) => (
-        <Card key={i}>
+  useEffect(() => {
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  if (loading) {
+    return <LoadingProgress steps={EVAL_STEPS} note="Scoring every response against its rubric — about 30 seconds." />;
+  }
+
+  const allAnswered = answered === tasks.length && tasks.length > 0;
+  const task = tasks[current];
+  const resp = responses[current] || "";
+  const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
+  const ss = String(elapsed % 60).padStart(2, "0");
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between text-sm">
+        <span className="font-semibold text-stone-800">
+          Task {current + 1} <span className="text-stone-400">of {tasks.length}</span>
+        </span>
+        <span className="flex items-center gap-3 text-stone-500">
+          <span className="tabular-nums">⏱ {mm}:{ss}</span>
+          <span>
+            {answered}/{tasks.length} answered
+          </span>
+        </span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
+        <div
+          className="h-full rounded-full bg-brand-500 transition-[width] duration-500"
+          style={{ width: `${(answered / tasks.length) * 100}%` }}
+        />
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-[200px_1fr]">
+        {/* Task rail */}
+        <aside className="no-print hidden md:block">
+          <div className="sticky top-20 space-y-1">
+            {tasks.map((t, i) => {
+              const ans = (responses[i] || "").trim().length > 0;
+              const active = i === current;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={
+                    "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm transition " +
+                    (active ? "bg-brand-50" : "hover:bg-stone-100")
+                  }
+                >
+                  <span
+                    className={
+                      "flex h-5 w-5 flex-none items-center justify-center rounded-full text-[11px] font-bold " +
+                      (ans
+                        ? "bg-brand-600 text-white"
+                        : active
+                          ? "border-2 border-brand-500 text-brand-600"
+                          : "border border-stone-300 text-stone-400")
+                    }
+                  >
+                    {ans ? "✓" : i + 1}
+                  </span>
+                  <span className={"truncate " + (active ? "font-semibold text-stone-900" : "text-stone-600")}>
+                    {t.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+
+        {/* Current task */}
+        <Card>
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-stone-400">TASK {i + 1}</span>
             <h3 className="text-base font-bold">{task.title}</h3>
             <Chip tone="brand">{task.difficulty}</Chip>
             <Chip>~{task.time_estimate_minutes} min</Chip>
           </div>
-          <p className="mb-2 text-sm text-stone-700">{task.scenario}</p>
+          <p className="mb-3 text-sm text-stone-700">{task.scenario}</p>
           {task.context && (
-            <div className="mb-2 rounded-xl bg-stone-50 p-3 text-sm text-stone-600">{task.context}</div>
+            <div className="mb-3 rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-600">
+              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-stone-400">Brief / data</p>
+              {task.context}
+            </div>
           )}
-          <p className="mb-1 text-sm font-medium text-stone-800">{task.instructions}</p>
+          <p className="mb-1 text-sm font-semibold text-stone-900">{task.instructions}</p>
           <p className="mb-3 text-xs text-stone-500">Deliverable: {task.expected_deliverable}</p>
-          <div className="mb-2 flex flex-wrap gap-1.5">
+          <div className="mb-3 flex flex-wrap gap-1.5">
             {task.competencies_tested.map((c, j) => (
               <Chip key={j}>{c}</Chip>
             ))}
           </div>
           <textarea
-            value={responses[i] || ""}
-            onChange={(e) => onChange(i, e.target.value)}
-            rows={7}
-            placeholder="Write your response…"
+            value={resp}
+            onChange={(e) => onChange(current, e.target.value)}
+            rows={9}
+            placeholder="Do the work here — write your response as you would on the job…"
             className={textareaCls}
           />
-          <p className="mt-1 text-right text-xs text-stone-400">
-            {(responses[i] || "").trim().length} chars
-          </p>
-        </Card>
-      ))}
+          <div className="mt-1 flex items-center justify-between text-xs text-stone-400">
+            <span>{resp.trim().length > 0 ? "Saved ✓" : "Not started"}</span>
+            <span>{resp.trim().length} chars</span>
+          </div>
 
-      <div className="flex items-center gap-3">
-        <Button onClick={onSubmit} disabled={loading || !allAnswered}>
-          {loading ? "Evaluating… (~30s)" : "Submit for evaluation"}
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <Button variant="ghost" onClick={() => setCurrent((c) => Math.max(0, c - 1))} disabled={current === 0}>
+              ← Prev
+            </Button>
+            {current < tasks.length - 1 ? (
+              <Button variant="ghost" onClick={() => setCurrent((c) => Math.min(tasks.length - 1, c + 1))}>
+                Next →
+              </Button>
+            ) : (
+              <span className="text-xs text-stone-400">Last task</span>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 border-t border-stone-200 pt-4">
+        <Button onClick={onSubmit} disabled={!allAnswered}>
+          Submit for evaluation
         </Button>
-        <span className="text-sm text-stone-500">
-          {answered} of {tasks.length} answered
-        </span>
+        {!allAnswered && (
+          <span className="text-sm text-stone-500">Answer all {tasks.length} tasks to submit.</span>
+        )}
       </div>
     </div>
   );

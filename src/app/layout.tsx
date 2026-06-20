@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +22,14 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: { card: "summary_large_image", title: "FirstWeek", description },
+  applicationName: "FirstWeek",
+  appleWebApp: { capable: true, title: "FirstWeek", statusBarStyle: "default" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#c8472a",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

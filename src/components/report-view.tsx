@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import type { Report } from "@/lib/schemas";
 import { Card, Chip, H, impTone, bandTone } from "@/components/ui";
+import { ScoreGauge } from "@/components/visuals";
 
-const RING: Record<string, string> = {
-  emerald: "border-emerald-500 text-emerald-600",
-  brand: "border-brand-500 text-brand-600",
-  amber: "border-amber-500 text-amber-600",
-  rose: "border-rose-500 text-rose-600",
-};
+function sevTone(s: string) {
+  if (s === "high") return "rose";
+  if (s === "medium") return "amber";
+  return "stone";
+}
 
 export function ReportView({
   report,
@@ -18,38 +19,68 @@ export function ReportView({
   perTask: { taskTitle: string; score: number }[];
 }) {
   const tone = bandTone(report.readiness_band);
+  const [copied, setCopied] = useState(false);
+
+  function copySummary() {
+    const lines = [
+      `FirstWeek readiness: ${report.overall_score}/100 — ${report.readiness_band} (confidence: ${report.confidence_level})`,
+      "",
+      report.application_recommendation,
+      "",
+      "Strengths:",
+      ...report.strengths_demonstrated.map((s) => `• ${s.strength}`),
+      "",
+      "Gaps to prepare:",
+      ...report.skill_gaps.map((g) => `• ${g.gap} (${g.importance_for_role})`),
+    ];
+    navigator.clipboard?.writeText(lines.join("\n")).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    });
+  }
 
   return (
     <div className="space-y-5">
-      <div className="no-print flex justify-end">
+      <div className="no-print flex justify-end gap-2">
+        <button
+          onClick={copySummary}
+          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100"
+        >
+          {copied ? "Copied ✓" : "Copy summary"}
+        </button>
         <button
           onClick={() => window.print()}
-          className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100"
+          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100"
         >
           Print / save PDF
         </button>
       </div>
 
-      <Card className="print-clean">
-        <div className="flex items-center gap-6">
-          <div
-            className={
-              "flex h-28 w-28 flex-none flex-col items-center justify-center rounded-full border-4 " +
-              RING[tone]
-            }
-          >
-            <span className="text-3xl font-extrabold">{report.overall_score}</span>
-            <span className="text-xs text-stone-400">/ 100</span>
-          </div>
-          <div>
-            <div className="mb-1 flex flex-wrap items-center gap-2">
+      {/* Hero */}
+      <Card className="print-clean bg-gradient-to-br from-brand-50 to-stone-50">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+          <ScoreGauge score={report.overall_score} tone={tone} />
+          <div className="flex-1 text-center sm:text-left">
+            <div className="mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <Chip tone={tone}>{report.readiness_band}</Chip>
               <Chip>Confidence: {report.confidence_level}</Chip>
             </div>
-            <p className="text-sm text-stone-700">{report.application_recommendation}</p>
+            <p className="text-sm leading-relaxed text-stone-700">{report.application_recommendation}</p>
           </div>
         </div>
       </Card>
+
+      {/* Context */}
+      <div className="grid gap-5 md:grid-cols-2">
+        <Card className="print-clean">
+          <H>Candidate</H>
+          <p className="text-sm text-stone-700">{report.candidate_summary}</p>
+        </Card>
+        <Card className="print-clean">
+          <H>Target role</H>
+          <p className="text-sm text-stone-700">{report.target_role_summary}</p>
+        </Card>
+      </div>
 
       {perTask.length > 0 && (
         <Card className="print-clean">
@@ -61,8 +92,11 @@ export function ReportView({
                   <span className="text-stone-700">{t.taskTitle}</span>
                   <span className="font-semibold">{t.score}</span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
-                  <div className="h-full rounded-full bg-brand-500" style={{ width: `${t.score}%` }} />
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-stone-100">
+                  <div
+                    className="h-full rounded-full bg-brand-500 transition-[width] duration-1000"
+                    style={{ width: `${t.score}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -73,20 +107,21 @@ export function ReportView({
       <div className="grid gap-5 md:grid-cols-2">
         <Card className="print-clean">
           <H>Strengths demonstrated</H>
-          <ul className="space-y-2 text-sm text-stone-700">
+          <ul className="space-y-3 text-sm text-stone-700">
             {report.strengths_demonstrated.map((s, i) => (
-              <li key={i}>
-                <span className="font-medium">{s.strength}</span> — {s.relevance_to_role}
+              <li key={i} className="border-l-2 border-emerald-300 pl-3">
+                <span className="font-semibold text-stone-900">{s.strength}</span>
+                <div className="text-stone-500">{s.relevance_to_role}</div>
               </li>
             ))}
           </ul>
         </Card>
         <Card className="print-clean">
           <H>Skill gaps</H>
-          <ul className="space-y-2 text-sm text-stone-700">
+          <ul className="space-y-3 text-sm text-stone-700">
             {report.skill_gaps.map((g, i) => (
-              <li key={i}>
-                <span className="font-medium">{g.gap}</span>{" "}
+              <li key={i} className="border-l-2 border-stone-200 pl-3">
+                <span className="font-semibold text-stone-900">{g.gap}</span>{" "}
                 <Chip tone={impTone(g.importance_for_role)}>{g.importance_for_role}</Chip>
                 <div className="text-stone-500">{g.recommendation}</div>
               </li>
@@ -94,6 +129,34 @@ export function ReportView({
           </ul>
         </Card>
       </div>
+
+      {(report.transferable_skills.length > 0 || report.risk_factors.length > 0) && (
+        <div className="grid gap-5 md:grid-cols-2">
+          <Card className="print-clean">
+            <H>Transferable skills</H>
+            <ul className="space-y-3 text-sm text-stone-700">
+              {report.transferable_skills.map((t, i) => (
+                <li key={i}>
+                  <span className="font-semibold text-stone-900">{t.skill}</span>
+                  <div className="text-stone-500">{t.application_to_role}</div>
+                </li>
+              ))}
+            </ul>
+          </Card>
+          <Card className="print-clean">
+            <H>Risk factors</H>
+            <ul className="space-y-3 text-sm text-stone-700">
+              {report.risk_factors.map((r, i) => (
+                <li key={i}>
+                  <span className="font-semibold text-stone-900">{r.risk}</span>{" "}
+                  <Chip tone={sevTone(r.severity)}>{r.severity}</Chip>
+                  <div className="text-stone-500">{r.mitigation}</div>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+      )}
 
       <Card className="print-clean">
         <H>Recommended learning path</H>
@@ -114,21 +177,21 @@ export function ReportView({
 
       <Card className="print-clean">
         <H>Interview prep focus</H>
-        <ul className="space-y-2 text-sm text-stone-700">
+        <ul className="space-y-3 text-sm text-stone-700">
           {report.interview_prep_focus.map((p, i) => (
             <li key={i}>
-              <span className="font-medium">{p.topic}</span> — {p.why}
+              <span className="font-semibold text-stone-900">{p.topic}</span> — {p.why}
               <div className="text-stone-500">Tip: {p.preparation_tip}</div>
             </li>
           ))}
         </ul>
       </Card>
 
-      <Card className="print-clean">
+      <Card className="print-clean border-brand-200 bg-brand-50/40">
         <H>Hiring manager summary</H>
-        <p className="text-sm text-stone-700">{report.hiring_manager_summary}</p>
-        <p className="mt-2 text-sm text-stone-600">
-          <span className="font-medium">Learning curve:</span> {report.learning_curve_estimate}
+        <p className="text-sm leading-relaxed text-stone-800">{report.hiring_manager_summary}</p>
+        <p className="mt-3 text-sm text-stone-600">
+          <span className="font-semibold">Learning curve:</span> {report.learning_curve_estimate}
         </p>
       </Card>
 
