@@ -10,8 +10,9 @@
 
 - **One full assessment = ~8 OpenAI calls** (job extract, candidate extract, match, simulation, 3× task eval, report).
 - **Today (default `gpt-4o`): ~$0.19 / assessment.** Output tokens dominate the bill.
-- **Biggest lever is model choice, and it's a one-line env change.** Moving the default to `gpt-4.1-mini` drops it to **~$0.03** (≈84% cut); `gpt-4o-mini` to **~$0.011**.
-- **Recommended:** `gpt-4.1-mini` as the default for all stages, with an optional **premium tier** that upgrades only *evaluation + report* to `gpt-4.1` (~$0.08) and sells that as higher-fidelity scoring.
+- **Biggest lever is model choice, and it's a one-line env change.** All-`gpt-4o-mini` is **~$0.011** (≈94% cut vs. `gpt-4o`).
+- **Implemented:** per-stage routing — `gpt-4o-mini` for extraction/match/simulation, `gpt-4o` for evaluation + report (the quality-sensitive stages). Tiered cost **~$0.09/assessment** (~50% under all-`gpt-4o`) while keeping user-facing quality high. Set both env vars to `gpt-4o-mini` to go all-cheap (~$0.011).
+- ⚠️ **The `gpt-4.1` family is not accessible on this OpenAI project** (returns 403). `gpt-4.1-mini` is cheaper-per-quality than `gpt-4o-mini` — **request 4.1 access**, then flip `OPENAI_MODEL`/`OPENAI_MODEL_QUALITY` to unlock it.
 - At ~$0.03 COGS, **every pricing tier clears 90%+ gross margin.** The constraint isn't cost — it's distribution. The real money is the **employer/B2B** side (~99% margin per candidate).
 
 ---
@@ -122,7 +123,7 @@ This turns every number in this doc from an estimate into a measured fact — do
 ## 7. Recommended sequence (do this first)
 
 1. **Instrument cost** (§5) — add token/cost logging to `ai_logs`. ~1 hour, unblocks everything.
-2. **Flip default to `gpt-4.1-mini`** (L1) and spot-check evaluation quality vs. `gpt-4.1`. ~84% cost cut if quality holds.
+2. ✅ **Done** — per-stage routing is live (`gpt-4o-mini` base, `gpt-4o` for eval+report). Spot-check that `gpt-4o-mini` evaluation quality holds vs. `gpt-4o`; request `gpt-4.1` access to cut cost further.
 3. **Add per-stage tiering** (L2) so paid tiers get `gpt-4.1` eval+report as a feature.
 4. **Re-enable email confirmation** + **1-free-per-account** gate (§4) before any public launch.
 5. **Ship Pro (credits or $19/mo)** once 2–4 are in place; start the **B2B** conversation in parallel — that's where the margin lives.

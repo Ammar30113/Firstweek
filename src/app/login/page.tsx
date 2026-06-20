@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -46,7 +47,13 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-5 py-16">
       <h1 className="mb-1 text-2xl font-bold">FirstWeek</h1>
-      <p className="mb-6 text-sm text-slate-500">Simulate the job before you apply.</p>
+      <p className="mb-1 text-sm text-slate-500">Simulate the job before you apply.</p>
+      <Link
+        href="/story"
+        className="mb-6 inline-block text-sm font-medium text-blue-600 hover:underline"
+      >
+        Why I built this →
+      </Link>
 
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold">

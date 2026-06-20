@@ -20,10 +20,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen">
         <nav className="no-print border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-3">
-            <Link href="/" className="font-bold tracking-tight">
-              FirstWeek
-            </Link>
-            {user && (
+            <div className="flex items-center gap-4">
+              <Link href="/" className="font-bold tracking-tight">
+                FirstWeek
+              </Link>
+              <Link href="/story" className="text-sm text-slate-500 hover:text-slate-900">
+                Story
+              </Link>
+            </div>
+            {user ? (
               <div className="flex items-center gap-4 text-sm">
                 <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">
                   Dashboard
@@ -38,6 +43,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   </button>
                 </form>
               </div>
+            ) : (
+              <Link href="/login" className="text-sm font-medium text-blue-600 hover:underline">
+                Sign in
+              </Link>
             )}
           </div>
         </nav>

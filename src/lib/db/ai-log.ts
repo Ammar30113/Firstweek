@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { MODEL } from "@/lib/ai/client";
+import { modelForStep } from "@/lib/ai/client";
 
 /**
  * Times an AI stage and writes a best-effort row to ai_logs (service-role).
@@ -34,7 +34,7 @@ async function writeLog(
         user_id: ctx.userId ?? null,
         assessment_id: ctx.assessmentId ?? null,
         step_name: step,
-        model: MODEL,
+        model: modelForStep(step),
         duration_ms: durationMs,
         error,
       });
