@@ -1,7 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap");
 @import "tailwindcss";
 
-/* Warm & human design system: stone neutrals + a terracotta brand. */
+/* Warm & human design system: stone neutrals, a terracotta brand, an espresso
+   "ink" ladder for cinematic dark sections, and a warm ember accent. */
 @theme {
   --color-brand-50: #fdf4f0;
   --color-brand-100: #fbe7dd;
@@ -13,7 +14,26 @@
   --color-brand-700: #a63a24;
   --color-brand-800: #883122;
   --color-brand-900: #702c20;
+
+  /* warm gold accent — gradient text, glow, highlights */
+  --color-ember-300: #f3c87a;
+  --color-ember-400: #e6a85a;
+  --color-ember-500: #d4913f;
+
+  /* espresso ink ladder for dark sections (warm undertone, not gray) */
+  --color-ink-950: #140c06;
+  --color-ink-900: #1b110a;
+  --color-ink-800: #241710;
+  --color-ink-700: #33231a;
+  --color-ink-600: #4a3326;
+
+  /* warm creams / sand */
+  --color-cream-50: #faf4ec;
+  --color-cream-100: #f3e9da;
+  --color-cream-200: #e8d8c2;
+
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
 }
 
 :root {
@@ -21,8 +41,130 @@
 }
 
 body {
-  @apply bg-stone-50 text-stone-900 antialiased;
+  @apply bg-cream-50 text-stone-900 antialiased;
   font-family: var(--font-sans);
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
+/* ----------------------------------------------------------- gradient text */
+.text-gradient {
+  background-image: linear-gradient(100deg, #f3c87a 0%, #e67d57 48%, #c8472a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ------------------------------------------------------------ film grain */
+/* SVG fractal-noise overlay — tactile warmth + kills gradient banding. */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+}
+
+/* ------------------------------------------------ engineer's grid (masked) */
+.grid-warm {
+  background-image: linear-gradient(to right, rgba(255, 233, 200, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 233, 200, 0.08) 1px, transparent 1px);
+  background-size: 58px 58px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 78%);
+}
+
+.grid-warm-light {
+  background-image: linear-gradient(to right, rgba(120, 90, 60, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(120, 90, 60, 0.06) 1px, transparent 1px);
+  background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 30%, transparent 80%);
+}
+
+/* --------------------------------------------------------- aurora glow blobs */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(72px);
+  will-change: transform;
+  pointer-events: none;
+}
+@keyframes drift {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(6%, -5%) scale(1.12); }
+  66% { transform: translate(-5%, 5%) scale(0.94); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+.drift-slow { animation: drift 26s ease-in-out infinite; }
+.drift-slower { animation: drift 38s ease-in-out infinite; }
+
+/* ------------------------------------------------------------- float + glow */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.floaty { animation: floaty 7s ease-in-out infinite; }
+
+.glow-ember {
+  box-shadow: 0 0 0 1px rgba(230, 168, 90, 0.18), 0 24px 70px -24px rgba(221, 93, 53, 0.55),
+    0 10px 30px -12px rgba(0, 0, 0, 0.55);
+}
+
+/* ------------------------------------------------------------- caret + word */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.caret { animation: blink 1.05s step-end infinite; }
+
+@keyframes wordIn {
+  from { opacity: 0; transform: translateY(0.4em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.word-in { animation: wordIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ------------------------------------------------------------- scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ----------------------------------------------------------------- marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-slow, .drift-slower, .floaty, .caret, .marquee-track, .word-in {
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Print: hide app chrome, show only the report */

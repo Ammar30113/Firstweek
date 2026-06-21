@@ -1,14 +1,19 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Chip, Button } from "@/components/ui";
+import { HeroDemo, RotatingWord, Reveal, RoleMarquee, CountUp, GlowCTA } from "@/components/landing";
 
 export const dynamic = "force-dynamic";
 
 const STEPS = [
-  { n: "1", t: "Paste the job + your resume", d: "Any posting, any background. No account friction — paste and go." },
-  { n: "2", t: "AI maps the role and you", d: "It extracts what the job really involves and where your experience fits." },
-  { n: "3", t: "Do realistic work tasks", d: "3 tasks you'd actually face in the role — not trivia, real work." },
-  { n: "4", t: "Get a readiness report", d: "An honest, evidence-based score with strengths, gaps, and a prep plan." },
+  { n: "01", t: "Paste the job + your resume", d: "Any posting, any background. Or import the posting straight from its URL." },
+  { n: "02", t: "AI maps the role and you", d: "It pulls out what the job actually involves and where your experience really fits." },
+  { n: "03", t: "Do three real tasks", d: "Not trivia — the actual work you'd face in week one of the role." },
+  { n: "04", t: "Get your readiness report", d: "An honest, evidence-based score with your strengths, gaps, and a prep plan." },
+];
+
+const ROLES = [
+  "Customer Success", "Product Manager", "Data Analyst", "Marketing Lead", "Sales Rep",
+  "Operations", "Recruiter", "Project Manager", "Account Executive", "Support Lead",
 ];
 
 export default async function Landing() {
@@ -19,132 +24,187 @@ export default async function Landing() {
   const startHref = user ? "/assessment" : "/login";
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="mx-auto grid max-w-5xl items-center gap-10 px-5 pt-14 pb-10 md:grid-cols-2 md:pt-20">
-        <div>
-          <Chip tone="brand">Simulate the job before you apply</Chip>
-          <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-stone-900 sm:text-5xl">
-            Stop guessing if you&apos;re qualified.
-          </h1>
-          <p className="mt-4 text-lg text-stone-600">
-            Paste a job posting, do the real work the role involves, and get an honest readiness
-            report — so you walk into the interview knowing you can do it.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Button href={startHref} className="px-6 py-3 text-base">
-              Start free
-            </Button>
-            <Button href="/story" variant="ghost" className="px-6 py-3 text-base">
-              See the story
-            </Button>
-          </div>
-          <p className="mt-3 text-xs text-stone-400">
-            No degree required. Free to try. Built for people with ability, not just credentials.
-          </p>
+    <div className="bg-cream-50">
+      {/* ============================================ CINEMATIC HERO */}
+      <section className="grain relative overflow-hidden bg-ink-950">
+        {/* atmosphere */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="aurora drift-slow left-[-8%] top-[-12%] h-[42rem] w-[42rem] bg-brand-600/30" />
+          <div className="aurora drift-slower right-[-10%] top-[10%] h-[34rem] w-[34rem] bg-ember-500/20" />
+          <div className="aurora drift-slow bottom-[-20%] left-[30%] h-[30rem] w-[30rem] bg-brand-800/30" />
+          <div className="absolute inset-0 grid-warm" />
         </div>
 
-        {/* Live sample report */}
-        <Card className="relative">
-          <div className="absolute -top-3 left-5">
-            <Chip tone="brand">Sample report</Chip>
-          </div>
-          <div className="mt-2 flex items-center gap-5">
-            <div className="flex h-24 w-24 flex-none flex-col items-center justify-center rounded-full border-4 border-emerald-500 text-emerald-600">
-              <span className="text-3xl font-extrabold">78</span>
-              <span className="text-[10px] text-stone-400">/ 100</span>
+        <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-16 md:grid-cols-[1.05fr_1fr] md:pb-24 md:pt-24">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-ember-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-ember-400" />
+              Simulate the job before you apply
+            </span>
+
+            <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-5xl md:text-6xl">
+              Do the <span className="text-gradient">real work</span> before you get the job.
+            </h1>
+
+            <p className="mt-4 text-xl text-stone-300 sm:text-2xl">
+              Try it for <RotatingWord words={["a PM role", "a sales job", "an ops role", "a data role", "your first job"]} />
+            </p>
+
+            <p className="mt-5 max-w-md text-base leading-relaxed text-stone-400">
+              Paste any posting, do three realistic tasks from the role, and get an honest readiness
+              report — strengths, gaps, and whether you can actually do it.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <GlowCTA href={startHref}>Start free</GlowCTA>
+              <Link
+                href="/story"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-6 py-3 text-base font-medium text-stone-200 transition hover:bg-white/5"
+              >
+                See the story
+              </Link>
             </div>
-            <div>
-              <Chip tone="emerald">Strong Fit</Chip>
-              <p className="mt-2 text-sm text-stone-600">
-                You appear ready for this role. Lead with operational reasoning; prepare around SQL
-                and SaaS metrics.
-              </p>
-            </div>
+            <p className="mt-4 text-xs text-stone-500">
+              No account to look around · Free to run · Built for ability, not credentials.
+            </p>
           </div>
-          <div className="mt-5 space-y-3">
-            {[
-              ["Diagnose onboarding delay", 84],
-              ["Prioritize at-risk accounts", 79],
-              ["Recommend a workflow fix", 71],
-            ].map(([label, score]) => (
-              <div key={label as string}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="text-stone-700">{label}</span>
-                  <span className="font-semibold">{score}</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
-                  <div className="h-full rounded-full bg-brand-500" style={{ width: `${score}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+
+          <HeroDemo />
+        </div>
+
+        {/* role marquee + framing line */}
+        <div className="relative z-10 mx-auto max-w-6xl px-5 pb-14">
+          <p className="mb-4 text-center text-xs uppercase tracking-[0.2em] text-stone-500">
+            Works for any role you can paste
+          </p>
+          <RoleMarquee roles={ROLES} />
+        </div>
       </section>
 
-      {/* How it works */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
-        <h2 className="text-center text-2xl font-bold tracking-tight">How it works</h2>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s) => (
-            <Card key={s.n}>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 font-bold text-brand-700">
-                {s.n}
+      {/* ============================================ WEDGE */}
+      <section className="relative mx-auto max-w-5xl px-5 py-20 text-center sm:py-28">
+        <Reveal>
+          <p className="font-display text-2xl leading-snug tracking-tight text-stone-900 sm:text-4xl">
+            Everyone else preps you to <span className="text-stone-400">talk about</span> the job.
+            <br className="hidden sm:block" /> FirstWeek lets you <span className="text-gradient">do it.</span>
+          </p>
+        </Reveal>
+      </section>
+
+      {/* ============================================ HOW IT WORKS */}
+      <section className="mx-auto max-w-6xl px-5 pb-8">
+        <Reveal className="mb-12 text-center">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">How it works</span>
+          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
+            Four steps from posting to verdict
+          </h2>
+        </Reveal>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 90}>
+              <div className="group h-full rounded-2xl border border-stone-200/80 bg-white p-6 shadow-[0_1px_3px_rgba(40,30,20,0.04)] transition hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_18px_40px_-22px_rgba(200,71,42,0.45)]">
+                <span className="font-display text-3xl font-semibold text-brand-200 transition group-hover:text-brand-400">
+                  {s.n}
+                </span>
+                <h3 className="mt-3 font-bold text-stone-900">{s.t}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-stone-600">{s.d}</p>
               </div>
-              <h3 className="mt-3 font-bold text-stone-900">{s.t}</h3>
-              <p className="mt-1 text-sm text-stone-600">{s.d}</p>
-            </Card>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      {/* Differentiator */}
-      <section className="mx-auto max-w-5xl px-5 py-8">
-        <Card className="bg-gradient-to-br from-brand-50 to-stone-50">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div>
-              <h2 className="text-xl font-bold">This isn&apos;t a resume tool.</h2>
-              <p className="mt-2 text-sm text-stone-600">
-                Resume optimizers ask &quot;how can I describe myself better?&quot; FirstWeek answers
-                the deeper question: <span className="font-semibold text-stone-900">can I actually do the work?</span>
+      {/* ============================================ BENTO */}
+      <section className="mx-auto max-w-6xl px-5 py-16">
+        <div className="grid gap-4 md:grid-cols-3 md:auto-rows-[minmax(0,1fr)]">
+          {/* anchor cell */}
+          <Reveal className="md:col-span-2 md:row-span-2">
+            <div className="grain relative h-full overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 to-brand-800 p-8 text-white">
+              <div className="relative">
+                <h3 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">This isn&apos;t a resume tool.</h3>
+                <p className="mt-3 max-w-md text-brand-50/90">
+                  Resume optimizers ask <span className="italic">&quot;how do I describe myself better?&quot;</span> FirstWeek
+                  answers the question that actually gets you hired:
+                  <span className="font-semibold text-white"> can I do the work?</span>
+                </p>
+                <ul className="mt-6 space-y-2.5 text-sm">
+                  {[
+                    "Scored on the work, not keywords",
+                    "Real tasks from the actual posting",
+                    "Demonstrated capability, not self-reported skills",
+                  ].map((t) => (
+                    <li key={t} className="flex items-center gap-2.5">
+                      <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/20 text-xs">✓</span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <div className="flex h-full flex-col justify-between rounded-3xl border border-stone-200/80 bg-white p-6">
+              <span className="text-sm font-medium text-stone-500">Every run scores you on</span>
+              <div className="font-display text-5xl font-semibold tracking-tight text-stone-900">
+                <CountUp to={100} />
+                <span className="text-brand-500">pt</span>
+              </div>
+              <span className="text-sm text-stone-500">readiness scale — with the why behind it.</span>
+            </div>
+          </Reveal>
+
+          <Reveal delay={160}>
+            <div className="flex h-full flex-col justify-center gap-2 rounded-3xl border border-stone-200/80 bg-stone-900 p-6 text-white">
+              <span className="font-display text-xl font-semibold">Strengths + gaps</span>
+              <p className="text-sm text-stone-400">
+                See exactly where you&apos;re strong, where you&apos;ll struggle, and how to prep — with evidence
+                from your own work.
               </p>
             </div>
-            <ul className="space-y-2 text-sm">
-              <li className="flex gap-2"><span className="text-brand-600">✓</span> Evaluate work, not keywords</li>
-              <li className="flex gap-2"><span className="text-brand-600">✓</span> Practical simulation, not a personality test</li>
-              <li className="flex gap-2"><span className="text-brand-600">✓</span> Demonstrated capability, not self-reported skills</li>
-            </ul>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============================================ STORY */}
+      <section className="mx-auto max-w-4xl px-5 py-16">
+        <Reveal>
+          <figure className="rounded-3xl border border-stone-200/80 bg-white p-10 text-center shadow-[0_2px_10px_rgba(40,30,20,0.05)]">
+            <blockquote className="mx-auto max-w-2xl font-display text-xl font-medium leading-relaxed text-stone-800 sm:text-2xl">
+              &ldquo;If you&apos;ve ever second-guessed yourself in front of a job you know you can do —
+              this was built for you.&rdquo;
+            </blockquote>
+            <Link
+              href="/story"
+              className="mt-5 inline-block text-sm font-semibold text-brand-600 hover:underline"
+            >
+              Read why I built FirstWeek →
+            </Link>
+          </figure>
+        </Reveal>
+      </section>
+
+      {/* ============================================ FINAL CTA (dark bookend) */}
+      <section className="grain relative overflow-hidden bg-ink-950">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="aurora drift-slow left-[20%] top-[-30%] h-[28rem] w-[28rem] bg-brand-600/30" />
+          <div className="aurora drift-slower right-[10%] bottom-[-40%] h-[26rem] w-[26rem] bg-ember-500/20" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-3xl px-5 py-20 text-center sm:py-24">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            You can do the job.
+            <br /> <span className="text-gradient">Let&apos;s prove it.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-stone-400">
+            Run your first simulation free and find out exactly where you stand.
+          </p>
+          <div className="mt-8 flex justify-center">
+            <GlowCTA href={startHref}>Start free</GlowCTA>
           </div>
-        </Card>
-      </section>
-
-      {/* Story strip */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
-        <div className="rounded-2xl border border-stone-200/80 bg-white p-8 text-center shadow-sm">
-          <p className="mx-auto max-w-2xl text-lg font-medium text-stone-800">
-            &quot;If you&apos;ve ever second-guessed yourself in front of a job you know you can do —
-            this was built for you.&quot;
-          </p>
-          <Link href="/story" className="mt-3 inline-block text-sm font-semibold text-brand-600 hover:underline">
-            Read why I built FirstWeek →
-          </Link>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="mx-auto max-w-5xl px-5 pb-16">
-        <div className="rounded-2xl bg-stone-900 px-8 py-12 text-center">
-          <h2 className="text-2xl font-bold text-white">You can do the job. Let&apos;s prove it.</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-stone-300">
-            Run your first simulation free and find out where you really stand.
-          </p>
-          <Button href={startHref} className="mt-6 px-6 py-3 text-base">
-            Start free
-          </Button>
-        </div>
-      </section>
-
-      <footer className="mx-auto max-w-5xl px-5 pb-10 text-center text-xs text-stone-400">
+      <footer className="mx-auto max-w-5xl px-5 py-10 text-center text-xs text-stone-400">
         FirstWeek produces a simulation-based readiness estimate for self-assessment. It does not
         guarantee employment outcomes.
       </footer>
