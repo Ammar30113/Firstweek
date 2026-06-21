@@ -24,13 +24,13 @@ export default function LoginPage() {
       if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.push("/");
+        router.push("/assessment");
         router.refresh();
       } else {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
         if (data.session) {
-          router.push("/");
+          router.push("/assessment");
           router.refresh();
         } else {
           setNotice("Account created. Check your email to confirm, then sign in.");
