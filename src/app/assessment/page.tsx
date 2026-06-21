@@ -267,10 +267,7 @@ function InputView({
       </Card>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Card>
-          <H>Job description</H>
-          <textarea value={jobText} onChange={(e) => onJob(e.target.value)} rows={15} className={textareaCls} />
-        </Card>
+        <JobSourceCard jobText={jobText} onJob={onJob} />
         <Card>
           <H>Your resume / profile</H>
           <textarea value={resumeText} onChange={(e) => onResume(e.target.value)} rows={15} className={textareaCls} />
@@ -285,6 +282,111 @@ function InputView({
         </Button>
       )}
     </div>
+  );
+}
+
+/* ----------------------------------------------------------- job source */
+
+// Job-description input with a Paste | From URL toggle. Fetching a URL pulls the
+// posting text server-side (SSRF-guarded) and drops it into the textarea, which
+// stays editable and is the single source of truth submitted to the pipeline.
+// Paste is the default and the fallback whenever a fetch can't extract text.
+function JobSourceCard({ jobText, onJob }: { jobText: string; onJob: (v: string) => void }) {
+  const [mode, setMode] = useState<"paste" | "url">("paste");
+  const [url, setUrl] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [fetchErr, setFetchErr] = useState<string | null>(null);
+  const [imported, setImported] = useState<string | null>(null);
+
+  async function importUrl() {
+    const trimmed = url.trim();
+    if (!trimmed || fetching) return; // idempotent: ignore re-entry while a fetch is in flight
+    setFetching(true);
+    setFetchErr(null);
+    try {
+      const data = await postJSON<{ text: string; source: string }>("/api/job/fetch", { url: trimmed });
+      onJob(data.text);
+      setImported(data.source);
+      setUrl("");
+      setMode("paste");
+    } catch (e) {
+      setFetchErr(e instanceof Error ? e.message : "Couldn't fetch that URL.");
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  const tab = (key: "paste" | "url", label: string) => (
+    <button
+      type="button"
+      onClick={() => {
+        setMode(key);
+        setFetchErr(null);
+        setImported(null); // the note refers to the last import; drop it on any tab switch
+      }}
+      className={
+        "rounded-lg px-2.5 py-1 text-xs font-medium transition " +
+        (mode === key ? "bg-brand-600 text-white" : "text-stone-500 hover:bg-stone-100")
+      }
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <Card>
+      <div className="mb-2 flex items-center justify-between">
+        <H>Job description</H>
+        <div className="flex gap-1 rounded-xl bg-stone-100 p-0.5">
+          {tab("paste", "Paste")}
+          {tab("url", "From URL")}
+        </div>
+      </div>
+
+      {mode === "url" ? (
+        <div className="space-y-2">
+          <p className="text-xs text-stone-500">
+            Paste a link to the job posting. Works best on company career pages and ATS boards (Greenhouse,
+            Lever, Ashby). Some sites (LinkedIn, Indeed) block automated reads — paste the text if it can&apos;t
+            pull it.
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={url}
+              disabled={fetching}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !fetching && url.trim()) importUrl();
+              }}
+              placeholder="https://company.com/careers/role"
+              className="min-w-0 flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 disabled:opacity-60"
+            />
+            <Button onClick={importUrl} disabled={fetching || !url.trim()}>
+              {fetching ? "Fetching…" : "Fetch"}
+            </Button>
+          </div>
+          {fetchErr && <p className="text-xs text-rose-600">{fetchErr}</p>}
+        </div>
+      ) : (
+        <>
+          {imported && (
+            <p className="mb-2 text-xs text-emerald-700">
+              Imported from {imported} — review and edit before running.
+            </p>
+          )}
+          <textarea
+            value={jobText}
+            onChange={(e) => {
+              onJob(e.target.value);
+              if (imported) setImported(null); // once they edit, the "imported" provenance no longer holds
+            }}
+            rows={15}
+            className={textareaCls}
+          />
+        </>
+      )}
+    </Card>
   );
 }
 

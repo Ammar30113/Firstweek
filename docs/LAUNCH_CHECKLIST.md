@@ -7,6 +7,8 @@ deliberate pre-launch toggles (several are off so you can keep testing now).
 - [x] Secrets server-side only; `.env.local` gitignored (URL/anon/service keys)
 - [x] RLS on all tables, verified (owner-only; cross-user blocked)
 - [x] Security headers (`next.config.mjs`)
+- [x] Job-URL ingestion SSRF guard (`src/lib/ingest/job-url.ts`): http(s) only, private/loopback/link-local/CGNAT/metadata ranges blocked (IPv4 + IPv6 + IPv4-mapped), DNS-resolved + every redirect hop re-validated, body cap + total-deadline timeout. Unit-tested (22/22 block cases).
+- [ ] **Job-URL fetch: pin the validated IP** (custom `undici` dispatcher) to fully close the DNS-rebinding TOCTOU window between resolve and connect. Deferred hardening — the per-hop re-validation + literal checks close the trivially-exploitable holes; pinning needs an `undici` dep.
 - [ ] **Rotate the OpenAI API key** (was pasted in chat)
 - [ ] **Rotate the Supabase `sbp_` access token** (account-level, pasted in chat)
 - [ ] Move secrets into Vercel project env vars (not `.env.local`) for deploy

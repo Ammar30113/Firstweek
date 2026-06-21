@@ -10,7 +10,7 @@ Paste a job description → upload your resume → complete realistic work simul
 
 ## What It Does
 
-1. **Job Analysis** — AI extracts role requirements, day-to-day work, skills, tools, and hidden expectations from any job posting
+1. **Job Analysis** — paste a job posting (or import it from a URL) and AI extracts role requirements, day-to-day work, skills, tools, and hidden expectations
 2. **Candidate Profiling** — AI maps your resume to a structured capability profile
 3. **Work Simulations** — Generates 3–5 realistic tasks you'd actually face in the role
 4. **Evidence-Based Evaluation** — Scores your responses against role-specific rubrics with real evidence
