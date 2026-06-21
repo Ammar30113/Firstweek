@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "FirstWeek",
+    "slug": "firstweek",
+    "owner": "ab3011",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "firstweek",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#fafaf9",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ab3011.firstweek"
+    },
+    "android": {
+      "package": "com.ab3011.firstweek",
+      "adaptiveIcon": {
+        "backgroundColor": "#fafaf9",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
