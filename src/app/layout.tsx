@@ -41,14 +41,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className="min-h-screen">
-        <nav className="no-print sticky top-0 z-10 border-b border-stone-200/70 bg-stone-50/80 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
-            <div className="flex items-center gap-5">
-              <Link href="/" className="flex items-center gap-2 font-extrabold tracking-tight">
-                <span className="inline-block h-5 w-5 rounded-md bg-brand-600" />
-                FirstWeek
+        <nav className="no-print sticky top-0 z-30 border-b border-stone-200/60 bg-cream-50/80 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+            <div className="flex items-center gap-6">
+              <Link href="/" className="flex items-center gap-2.5">
+                <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-bold text-white shadow-[0_2px_8px_-2px_rgba(200,71,42,0.6)]">
+                  F
+                </span>
+                <span className="font-display text-lg font-semibold tracking-tight text-stone-900">FirstWeek</span>
               </Link>
-              <Link href="/story" className="text-sm text-stone-500 hover:text-stone-900">
+              <Link href="/story" className="text-sm text-stone-500 transition hover:text-stone-900">
                 Story
               </Link>
             </div>

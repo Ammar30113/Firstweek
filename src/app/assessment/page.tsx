@@ -408,7 +408,7 @@ function AnalysisView({
     <div className="space-y-5">
       <Card>
         <div className="mb-1 flex flex-wrap items-center gap-2">
-          <h2 className="text-lg font-bold">{job.job_title}</h2>
+          <h2 className="font-display text-xl font-semibold tracking-tight">{job.job_title}</h2>
           <Chip tone="brand">{job.seniority_level}</Chip>
           <Chip>{job.role_family}</Chip>
         </div>

@@ -7,11 +7,37 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
   return (
     <div
       className={
-        "rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_1px_3px_rgba(40,30,20,0.04)] " +
+        "rounded-2xl border border-stone-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(40,30,20,0.05),0_12px_32px_-20px_rgba(140,90,55,0.25)] " +
         className
       }
     >
       {children}
+    </div>
+  );
+}
+
+// Consistent page header — Fraunces display title with an optional eyebrow + action.
+export function PageHeader({
+  eyebrow,
+  title,
+  subtitle,
+  action,
+}: {
+  eyebrow?: string;
+  title: ReactNode;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        {eyebrow && (
+          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-600">{eyebrow}</span>
+        )}
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">{title}</h1>
+        {subtitle && <p className="mt-1.5 text-sm text-stone-500">{subtitle}</p>}
+      </div>
+      {action}
     </div>
   );
 }

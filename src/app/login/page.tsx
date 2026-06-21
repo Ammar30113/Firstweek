@@ -46,7 +46,12 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col px-5 py-16">
-      <h1 className="mb-1 text-2xl font-bold">FirstWeek</h1>
+      <div className="mb-2 flex items-center gap-2.5">
+        <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white shadow-[0_4px_14px_-4px_rgba(200,71,42,0.7)]">
+          F
+        </span>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-stone-900">FirstWeek</h1>
+      </div>
       <p className="mb-1 text-sm text-stone-500">Simulate the job before you apply.</p>
       <Link
         href="/story"
@@ -55,9 +60,9 @@ export default function LoginPage() {
         Why I built this →
       </Link>
 
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold">
-          {mode === "signin" ? "Sign in" : "Create account"}
+      <div className="rounded-2xl border border-stone-200/70 bg-white p-6 shadow-[0_1px_2px_rgba(40,30,20,0.05),0_18px_44px_-22px_rgba(140,90,55,0.3)]">
+        <h2 className="mb-4 font-display text-xl font-semibold text-stone-900">
+          {mode === "signin" ? "Welcome back" : "Create your account"}
         </h2>
 
         {error && (
@@ -78,7 +83,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full rounded-lg border border-stone-200 p-2.5 text-sm focus:border-brand-400 focus:outline-none"
+            className="w-full rounded-xl border border-stone-200 p-2.5 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100"
           />
           <input
             type="password"
@@ -87,12 +92,12 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password (min 6 characters)"
-            className="w-full rounded-lg border border-stone-200 p-2.5 text-sm focus:border-brand-400 focus:outline-none"
+            className="w-full rounded-xl border border-stone-200 p-2.5 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100"
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+            className="w-full rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-10px_rgba(200,71,42,0.7)] transition hover:bg-brand-500 disabled:opacity-50"
           >
             {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>

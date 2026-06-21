@@ -57,7 +57,7 @@ export function ReportView({
       </div>
 
       {/* Hero */}
-      <Card className="print-clean bg-gradient-to-br from-brand-50 to-stone-50">
+      <Card className="print-clean bg-gradient-to-br from-brand-50 via-cream-50 to-cream-100">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
           <ScoreGauge score={report.overall_score} tone={tone} />
           <div className="flex-1 text-center sm:text-left">
@@ -65,7 +65,9 @@ export function ReportView({
               <Chip tone={tone}>{report.readiness_band}</Chip>
               <Chip>Confidence: {report.confidence_level}</Chip>
             </div>
-            <p className="text-sm leading-relaxed text-stone-700">{report.application_recommendation}</p>
+            <p className="font-display text-lg font-medium leading-relaxed text-stone-800">
+              {report.application_recommendation}
+            </p>
           </div>
         </div>
       </Card>
