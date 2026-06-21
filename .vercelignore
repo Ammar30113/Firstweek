@@ -1,0 +1,3 @@
+# The native Expo app (mobile/) is a separate app built by EAS, not Vercel.
+# Keep it out of the web deployment entirely.
+mobile
