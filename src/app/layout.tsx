@@ -95,6 +95,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </nav>
         {children}
+
+        <footer className="no-print border-t border-stone-200/60 bg-cream-50">
+          <div className="mx-auto max-w-6xl px-5 py-10">
+            <div className="flex flex-wrap items-center justify-between gap-5">
+              <Link href="/" className="flex items-center gap-2.5">
+                <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-bold text-white">
+                  F
+                </span>
+                <span className="font-display text-base font-semibold tracking-tight text-stone-900">FirstWeek</span>
+              </Link>
+              <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-stone-500">
+                <Link href="/guides" className="transition hover:text-stone-900">Guides</Link>
+                <Link href="/pricing" className="transition hover:text-stone-900">Pricing</Link>
+                <Link href="/story" className="transition hover:text-stone-900">Story</Link>
+                <Link href="/support" className="transition hover:text-stone-900">Support</Link>
+                <Link href="/privacy" className="transition hover:text-stone-900">Privacy</Link>
+                <Link href="/terms" className="transition hover:text-stone-900">Terms</Link>
+              </nav>
+            </div>
+            <p className="mt-6 text-xs leading-relaxed text-stone-400">
+              FirstWeek produces a simulation-based readiness estimate for self-assessment. It does not guarantee
+              employment, interviews, or job outcomes. © 2026 FirstWeek.
+            </p>
+          </div>
+        </footer>
+
         <Analytics />
         <SpeedInsights />
       </body>

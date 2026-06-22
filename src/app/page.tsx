@@ -206,10 +206,6 @@ export default async function Landing() {
         </div>
       </section>
 
-      <footer className="mx-auto max-w-5xl px-5 py-10 text-center text-xs text-stone-400">
-        FirstWeek produces a simulation-based readiness estimate for self-assessment. It does not
-        guarantee employment outcomes.
-      </footer>
     </div>
   );
 }
