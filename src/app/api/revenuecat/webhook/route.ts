@@ -16,9 +16,14 @@ const GRANT = new Set([
   "UNCANCELLATION",
   "PRODUCT_CHANGE",
   "SUBSCRIPTION_EXTENDED",
-  "NON_RENEWING_PURCHASE",
 ]);
 const REVOKE = new Set(["EXPIRATION"]);
+
+// app_user_id must be a Supabase auth UUID — reject anything else so a webhook
+// can't grant Pro to an arbitrary/garbage subject.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Bound a grant's expiry so a forged/replayed event can't mint near-permanent Pro.
+const MAX_GRANT_MS = 60 * 24 * 60 * 60 * 1000; // 60 days
 
 function authOk(header: string | null): boolean {
   const expected = process.env.RC_WEBHOOK_AUTH;
@@ -54,15 +59,21 @@ export async function POST(req: Request) {
   }
 
   const userId = event.app_user_id;
+  if (!UUID_RE.test(userId)) return NextResponse.json({ ok: true }); // ignore non-UUID subjects
+
   try {
     const admin = createAdminClient();
-    if (GRANT.has(event.type)) {
+    // Grants require an expiry (our product is a subscription); clamp it so a
+    // forged/replayed event can't grant near-permanent access. isPro also
+    // requires a future expiry, so a missing one simply grants nothing.
+    if (GRANT.has(event.type) && event.expiration_at_ms) {
+      const expiresMs = Math.min(event.expiration_at_ms, Date.now() + MAX_GRANT_MS);
       await admin.from("entitlements").upsert(
         {
           app_user_id: userId,
           entitlement: "pro",
           is_active: true,
-          expires_at: event.expiration_at_ms ? new Date(event.expiration_at_ms).toISOString() : null,
+          expires_at: new Date(expiresMs).toISOString(),
           store: event.store ?? null,
           updated_at: new Date().toISOString(),
         },

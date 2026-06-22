@@ -149,6 +149,7 @@ export default function AssessmentPage() {
     setResponses([]);
     setResult(null);
     setError(null);
+    setUpgrade(false);
   }
 
   const answered = responses.filter((r) => r.trim().length > 0).length;

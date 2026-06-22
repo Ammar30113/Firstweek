@@ -20,3 +20,15 @@ alter table public.entitlements enable row level security;
 drop policy if exists "entitlements_self_read" on public.entitlements;
 create policy "entitlements_self_read" on public.entitlements
   for select using (app_user_id = auth.uid()::text);
+
+-- Free-tier integrity: the free-assessment gate counts a user's assessments, so
+-- users must NOT be able to DELETE their own rows to reset the counter. Replace
+-- the broad "for all" policy (which includes DELETE) with select/insert/update
+-- only. The service role (cascade on account deletion) still bypasses RLS.
+drop policy if exists "own assessments" on public.assessments;
+create policy "own assessments select" on public.assessments
+  for select using (user_id = auth.uid());
+create policy "own assessments insert" on public.assessments
+  for insert with check (user_id = auth.uid());
+create policy "own assessments update" on public.assessments
+  for update using (user_id = auth.uid()) with check (user_id = auth.uid());

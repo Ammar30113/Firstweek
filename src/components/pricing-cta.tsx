@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -11,7 +11,9 @@ const RC_KEY = process.env.NEXT_PUBLIC_RC_WEB_BILLING_KEY;
 export function PricingCTA({ userId, loggedIn }: { userId?: string; loggedIn: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inFlight = useRef(false);
 
   // Billing not configured yet → honest placeholder, no broken checkout.
   if (!RC_KEY) {
@@ -34,6 +36,8 @@ export function PricingCTA({ userId, loggedIn }: { userId?: string; loggedIn: bo
   }
 
   async function upgrade() {
+    if (inFlight.current) return; // guard against double-submit / double-charge
+    inFlight.current = true;
     setLoading(true);
     setError(null);
     try {
@@ -43,13 +47,26 @@ export function PricingCTA({ userId, loggedIn }: { userId?: string; loggedIn: bo
       const pkg = offerings.current?.availablePackages?.[0];
       if (!pkg) throw new Error("No plan is available yet. Please try again shortly.");
       await purchases.purchase({ rcPackage: pkg });
-      // The webhook flips the entitlement; send them into the app.
+
+      // The purchase is done in RevenueCat, but our DB updates via the async
+      // webhook. Wait (briefly) for the "pro" entitlement to reflect before
+      // entering the gated app, so a just-paid user isn't bounced by the paywall.
+      setFinalizing(true);
+      for (let i = 0; i < 12; i++) {
+        const r = await fetch("/api/billing/status", { cache: "no-store" })
+          .then((x) => x.json())
+          .catch(() => null);
+        if (r?.pro) break;
+        await new Promise((res) => setTimeout(res, 1200));
+      }
       router.push("/assessment");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Checkout couldn't start. Please try again.");
     } finally {
       setLoading(false);
+      setFinalizing(false);
+      inFlight.current = false;
     }
   }
 
@@ -61,7 +78,7 @@ export function PricingCTA({ userId, loggedIn }: { userId?: string; loggedIn: bo
         disabled={loading}
         className="w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-cream-100 disabled:opacity-60"
       >
-        {loading ? "Opening checkout…" : "Upgrade to Pro"}
+        {finalizing ? "Finalizing your subscription…" : loading ? "Opening checkout…" : "Upgrade to Pro"}
       </button>
       {error && <p className="mt-2 text-center text-sm text-white/90">{error}</p>}
     </div>

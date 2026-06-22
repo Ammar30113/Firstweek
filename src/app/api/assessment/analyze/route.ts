@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     if (!limit.ok) return NextResponse.json({ error: limit.error }, { status: limit.status });
 
     // Free→paid gate (no-op until billing is configured).
-    const pay = await checkPaywall(supabase, user.id);
+    const pay = await checkPaywall(user.id);
     if (!pay.ok) return NextResponse.json({ error: pay.error, upgrade: true }, { status: pay.status });
 
     const body = await req.json();
