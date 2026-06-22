@@ -4,6 +4,7 @@ import { badRequest, serverError } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { aiContext } from "@/lib/ai/context";
 import { checkLimits } from "@/lib/db/guards";
+import { checkPaywall } from "@/lib/billing/entitlement";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -21,6 +22,10 @@ export async function POST(req: Request) {
 
     const limit = await checkLimits(supabase, user.id);
     if (!limit.ok) return NextResponse.json({ error: limit.error }, { status: limit.status });
+
+    // Free→paid gate (no-op until billing is configured).
+    const pay = await checkPaywall(supabase, user.id);
+    if (!pay.ok) return NextResponse.json({ error: pay.error, upgrade: true }, { status: pay.status });
 
     const body = await req.json();
     const job_description = String(body.job_description || "").trim().slice(0, MAX_INPUT);

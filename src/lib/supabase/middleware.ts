@@ -35,7 +35,8 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/login") ||
     path.startsWith("/auth") ||
     path.startsWith("/story") ||
-    path.startsWith("/guides");
+    path.startsWith("/guides") ||
+    path.startsWith("/pricing");
   const isApi = path.startsWith("/api");
 
   if (!user && !isPublic && !isApi) {

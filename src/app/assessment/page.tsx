@@ -52,7 +52,11 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.error || `Request failed (${res.status})`);
+  if (!res.ok) {
+    const err = new Error(data?.error || `Request failed (${res.status})`) as Error & { upgrade?: boolean };
+    err.upgrade = Boolean(data?.upgrade) || res.status === 402;
+    throw err;
+  }
   return data as T;
 }
 
@@ -70,6 +74,7 @@ export default function AssessmentPage() {
   const [phase, setPhase] = useState<Phase>("input");
   const [loading, setLoading] = useState<Loading>(null);
   const [error, setError] = useState<string | null>(null);
+  const [upgrade, setUpgrade] = useState(false);
 
   const [jobText, setJobText] = useState(SAMPLE_JOB_DESCRIPTION);
   const [resumeText, setResumeText] = useState(SAMPLE_RESUME);
@@ -81,6 +86,7 @@ export default function AssessmentPage() {
 
   async function runAnalysis() {
     setError(null);
+    setUpgrade(false);
     setLoading("analyzing");
     try {
       const data = await postJSON<Analysis>("/api/assessment/analyze", {
@@ -93,6 +99,7 @@ export default function AssessmentPage() {
       setPhase("analysis");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Analysis failed");
+      setUpgrade(Boolean((e as { upgrade?: boolean } | null)?.upgrade));
     } finally {
       setLoading(null);
     }
@@ -156,6 +163,11 @@ export default function AssessmentPage() {
       {error && (
         <div className="no-print mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {error}
+          {upgrade && (
+            <Link href="/pricing" className="ml-2 font-semibold text-brand-700 underline">
+              View Pro plans →
+            </Link>
+          )}
         </div>
       )}
 

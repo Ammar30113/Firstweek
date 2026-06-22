@@ -54,10 +54,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </span>
                 <span className="font-display text-lg font-semibold tracking-tight text-stone-900">FirstWeek</span>
               </Link>
-              <Link href="/guides" className="text-sm text-stone-500 transition hover:text-stone-900">
+              <Link href="/guides" className="hidden text-sm text-stone-500 transition hover:text-stone-900 sm:inline">
                 Guides
               </Link>
-              <Link href="/story" className="text-sm text-stone-500 transition hover:text-stone-900">
+              <Link href="/pricing" className="text-sm text-stone-500 transition hover:text-stone-900">
+                Pricing
+              </Link>
+              <Link href="/story" className="hidden text-sm text-stone-500 transition hover:text-stone-900 sm:inline">
                 Story
               </Link>
             </div>
