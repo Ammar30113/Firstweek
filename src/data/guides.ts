@@ -619,6 +619,148 @@ export const GUIDES: Guide[] = [
       { label: "Washington Monthly — How AI broke the entry-level job", url: "https://washingtonmonthly.com/2026/05/29/ai-entry-level-jobs-college-graduates/" },
     ],
   },
+
+  {
+    slug: "get-first-job-no-experience-2026",
+    category: "Entry-level",
+    title: "How to Get Your First Job With No Experience (2026)",
+    description:
+      "Entry-level got harder in 2026. Here's how to land your first job with no experience — by proving ability with small real work instead of a track record you don't have yet.",
+    keywords: [
+      "how to get a job with no experience",
+      "first job no experience 2026",
+      "entry level jobs no experience",
+      "get hired with no experience",
+    ],
+    datePublished: "2026-06-22",
+    readingMins: 6,
+    dek: "To get your first job with no experience in 2026, stop trying to prove a track record you don't have and start proving ability: build two or three small portfolio pieces, target genuinely entry-level roles, use referrals to skip the resume pile, and show you can already do a slice of the actual work.",
+    sections: [
+      {
+        heading: "Why entry-level got harder in 2026",
+        body: [
+          "The routine, well-defined tasks that used to be how juniors learned a job are exactly what AI now does cheaply. So entry-level postings have shrunk, and many \"entry-level\" roles quietly ask for two or three years — the \"experience creep\" that makes breaking in feel impossible.",
+          "It's not you. The bottom rung genuinely moved. The way around it is to change what you offer from experience to evidence.",
+        ],
+      },
+      {
+        heading: "Proof beats experience",
+        body: [
+          "You can't manufacture years of experience, but you can manufacture proof. Two or three concrete pieces that show you can do the work — a sample analysis, a small project, a teardown, a worked solution — outweigh an empty resume. Evidence is the currency when you don't have a track record.",
+        ],
+      },
+      {
+        heading: "Find the genuinely entry-level roles",
+        body: [
+          "Filter hard for roles that are actually open to beginners: apprenticeships, rotational programs, support and operations roles, and postings that say \"0–1 years\" and mean it. Don't waste applications on \"entry-level, 3 years required\" listings — they're not for you.",
+        ],
+      },
+      {
+        heading: "Use referrals to skip the pile",
+        body: [
+          "With no experience, a cold application is the weakest possible signal. A warm introduction — through alumni, communities, or anyone one degree away — gets you read by a human instead of filtered by a bot. Spend your energy on relationships, not application volume.",
+        ],
+      },
+      {
+        heading: "Do a slice of the job before they ask",
+        body: [
+          "The most convincing thing a no-experience candidate can do is show up having already done part of the actual job. That's exactly what a FirstWeek simulation produces: realistic tasks from a specific posting, scored honestly, so you can say \"I already did a version of your week one — here's how I approached it.\" For someone with no track record, that's the closest thing to experience you can build in an afternoon.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How do I get a job with no experience in 2026?",
+        a: "Substitute proof for a track record: build a small portfolio of real work, target genuinely entry-level roles, get referrals to skip the resume pile, and demonstrate you can do a slice of the actual job rather than just claiming potential.",
+      },
+      {
+        q: "What entry-level jobs are easiest to get with no experience?",
+        a: "Support, operations, and customer-facing roles, plus apprenticeships and rotational programs, tend to be the most open to beginners — especially when you can show communication skills and a willingness to do the real work.",
+      },
+      {
+        q: "How do you get experience if no one will hire you without experience?",
+        a: "Create the experience yourself: small projects, volunteer or freelance work, and simulations of the target role. Demonstrated ability functions as experience when you have no formal title to point to.",
+      },
+    ],
+    sources: [
+      { label: "CBS News — AI layoffs and entry-level workers", url: "https://www.cbsnews.com/news/ai-layoffs-hiring-entry-level-workers/" },
+      { label: "Washington Monthly — How AI broke the entry-level job", url: "https://washingtonmonthly.com/2026/05/29/ai-entry-level-jobs-college-graduates/" },
+    ],
+  },
+
+  {
+    slug: "ai-skills-to-learn-2026",
+    category: "Skills",
+    title: "The AI Skills Worth Learning in 2026 to Stay Hireable",
+    description:
+      "The most valuable AI skills in 2026 aren't about building models — they're about using AI well. Here's what to actually learn to stay hireable, and how to prove it.",
+    keywords: [
+      "ai skills to learn 2026",
+      "what ai skills to learn",
+      "become ai adjacent",
+      "ai literacy jobs",
+    ],
+    datePublished: "2026-06-22",
+    readingMins: 6,
+    dek: "The AI skills worth learning in 2026 aren't about coding models — they're about using AI well: directing AI tools with good prompts and context, verifying and editing their output, automating your own workflows, and pairing all of it with the judgment only you bring. That combination is what makes you hard to replace.",
+    sections: [
+      {
+        heading: "Stop trying to out-compute the machine",
+        body: [
+          "You will not beat AI at raw generation, and you don't need to. The durable skill in 2026 is being the person who directs, audits, and is accountable for AI's output — not the person competing with it. Aim to be AI-adjacent, not AI-replaceable.",
+        ],
+      },
+      {
+        heading: "The core AI skills that actually pay off",
+        body: ["Across almost every field, these are the skills employers reward:"],
+        list: {
+          items: [
+            "Using AI tools fluently — knowing what they're good and bad at, and reaching for them by reflex.",
+            "Prompting and context — getting reliable output by framing the problem and feeding the right information.",
+            "Verification and editing — catching where AI is confidently wrong, which is the scarce, valuable part.",
+            "Automation — wiring AI into your actual workflow to do more with less.",
+            "Data literacy — reading, questioning, and acting on what the numbers say.",
+          ],
+        },
+      },
+      {
+        heading: "Pair AI skills with domain judgment",
+        body: [
+          "AI skills in a vacuum aren't worth much; AI skills plus real judgment in a domain are. The people thriving in 2026 take what they already know — a field, a craft, a set of relationships — and use AI as leverage on top of it. Don't abandon your domain; supercharge it.",
+        ],
+      },
+      {
+        heading: "How to build these cheaply",
+        body: [
+          "You don't need a bootcamp. Pick real tasks from the work you want to do and do them with AI in the loop — draft, critique, automate, verify. Repetition on real problems builds these skills faster than any course, and it produces artifacts you can show.",
+        ],
+      },
+      {
+        heading: "Prove it, don't just list it",
+        body: [
+          "\"Proficient in AI tools\" on a resume means nothing — everyone writes it. What stands out is evidence: a task done well with AI as leverage, where your judgment is visible. A FirstWeek simulation of the target role is one way to show exactly that — you doing the real work, AI or not, with your reasoning on display.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What AI skills are most in demand in 2026?",
+        a: "Practical ones: using AI tools fluently, prompting and providing context, verifying and editing AI output, automating workflows, and data literacy — all paired with judgment in a specific domain.",
+      },
+      {
+        q: "Do I need to learn to code to work with AI?",
+        a: "No. Most valuable AI skills in 2026 are about using and directing AI tools well, not building models. Coding helps in some roles, but fluency, verification, and automation matter more for staying hireable across fields.",
+      },
+      {
+        q: "How do I become AI-adjacent?",
+        a: "Use AI as leverage on top of work you already understand: direct it, check it, automate with it, and stay accountable for the result. Being the human who owns the outcome is what makes you AI-adjacent rather than replaceable.",
+      },
+    ],
+    sources: [
+      { label: "Nucamp — Entry-level tech skills without a degree (2026)", url: "https://www.nucamp.co/blog/top-10-entry-level-tech-skills-to-get-hired-without-a-degree-in-2026" },
+      { label: "iMocha — Skills-based hiring trends 2026", url: "https://www.imocha.io/blog/skills-based-hiring-trends" },
+    ],
+  },
 ];
 
 export function getGuide(slug: string): Guide | undefined {

@@ -83,6 +83,8 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
+            aria-label="Email address"
+            autoComplete="email"
             className="w-full rounded-xl border border-stone-200 p-2.5 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100"
           />
           <input
@@ -92,6 +94,8 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password (min 6 characters)"
+            aria-label="Password"
+            autoComplete={mode === "signin" ? "current-password" : "new-password"}
             className="w-full rounded-xl border border-stone-200 p-2.5 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100"
           />
           <button

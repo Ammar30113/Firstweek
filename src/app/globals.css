@@ -167,6 +167,15 @@ body {
   }
 }
 
+/* Keyboard focus visibility — links/buttons (inputs carry their own focus ring) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #dd5d35;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
 /* Print: hide app chrome, show only the report */
 @media print {
   .no-print {

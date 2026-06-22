@@ -282,7 +282,13 @@ function InputView({
         <JobSourceCard jobText={jobText} onJob={onJob} />
         <Card>
           <H>Your resume / profile</H>
-          <textarea value={resumeText} onChange={(e) => onResume(e.target.value)} rows={15} className={textareaCls} />
+          <textarea
+            value={resumeText}
+            onChange={(e) => onResume(e.target.value)}
+            rows={15}
+            aria-label="Your resume or profile"
+            className={textareaCls}
+          />
         </Card>
       </div>
 
@@ -372,6 +378,7 @@ function JobSourceCard({ jobText, onJob }: { jobText: string; onJob: (v: string)
                 if (e.key === "Enter" && !fetching && url.trim()) importUrl();
               }}
               placeholder="https://company.com/careers/role"
+              aria-label="Job posting URL"
               className="min-w-0 flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 disabled:opacity-60"
             />
             <Button onClick={importUrl} disabled={fetching || !url.trim()}>
@@ -394,6 +401,7 @@ function JobSourceCard({ jobText, onJob }: { jobText: string; onJob: (v: string)
               if (imported) setImported(null); // once they edit, the "imported" provenance no longer holds
             }}
             rows={15}
+            aria-label="Job description"
             className={textareaCls}
           />
         </>
@@ -631,6 +639,7 @@ function SimulationView({
             onChange={(e) => onChange(current, e.target.value)}
             rows={9}
             placeholder="Do the work here — write your response as you would on the job…"
+            aria-label="Your response to this task"
             className={textareaCls}
           />
           <div className="mt-1 flex items-center justify-between text-xs text-stone-400">
