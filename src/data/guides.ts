@@ -472,6 +472,153 @@ export const GUIDES: Guide[] = [
       { label: "iMocha — Skills-based hiring trends 2026", url: "https://www.imocha.io/blog/skills-based-hiring-trends" },
     ],
   },
+
+  {
+    slug: "land-a-remote-job-2026",
+    category: "Remote work",
+    title: "How to Land a Remote Job in 2026 (Without the Scams)",
+    description:
+      "Remote roles draw hundreds of applicants and a flood of fake listings. How to find legit remote jobs in 2026 — and prove you can actually do the work from anywhere.",
+    keywords: [
+      "how to get a remote job 2026",
+      "legit remote jobs",
+      "remote jobs no experience",
+      "find remote work",
+    ],
+    datePublished: "2026-06-21",
+    readingMins: 6,
+    dek: "To land a remote job in 2026, target companies that are remote-first (not just \"remote-friendly\"), filter hard for scams (never pay to apply), and prove the two things remote employers worry you lack: self-direction and the ability to do the actual work without anyone looking over your shoulder.",
+    sections: [
+      {
+        heading: "The 2026 remote market: more applicants, more fakes",
+        body: [
+          "Remote roles get many times the applications of on-site ones, so the bar to stand out is higher. Worse, the surge in demand has been matched by a surge in fake and scam \"remote\" listings designed to harvest your data or money. The two problems compound: you're competing harder and wading through noise.",
+          "The fix is to be deliberate about where you apply and ruthless about red flags.",
+        ],
+      },
+      {
+        heading: "Remote-first beats remote-friendly",
+        body: [
+          "There's a real difference between companies built around remote work and companies that merely tolerate it. Remote-first companies have the documentation, async culture, and trust that make a remote hire succeed — and they're used to hiring people they've never met in person, which works in your favor.",
+          "Prioritize employers and job boards that are explicitly remote-first.",
+        ],
+      },
+      {
+        heading: "Spot and skip the scams",
+        body: ["Walk away the moment you see any of these:"],
+        list: {
+          items: [
+            "Any request for money, \"equipment fees,\" or your bank details before you're hired.",
+            "Offers with no interview, or interviews only over text/Telegram.",
+            "Vague company with no verifiable website, team, or domain email.",
+            "Pay that's wildly above market for little work.",
+            "A check mailed to you with instructions to buy things or wire money back.",
+          ],
+        },
+      },
+      {
+        heading: "What remote employers are really screening for",
+        body: [
+          "Beyond the skills, remote hiring managers are nervous about two things: can you manage yourself without a manager hovering, and can you communicate clearly in writing? A remote hire who needs constant supervision is a net negative. Show evidence of autonomy and crisp written communication everywhere you can.",
+        ],
+      },
+      {
+        heading: "Prove you can do the work from day one",
+        body: [
+          "The strongest signal you can send a remote employer is that you can already do the role's real work, unsupervised. That's exactly what a FirstWeek simulation produces: you complete realistic tasks from the actual posting on your own, and get an honest readout — proof of self-directed capability, which is the whole thing remote employers are betting on.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How do I find legit remote jobs in 2026?",
+        a: "Target remote-first companies and reputable remote job boards, verify the company has a real website and domain email, and never pay to apply. Apply to fewer roles with stronger, tailored proof rather than mass-applying.",
+      },
+      {
+        q: "Can you get a remote job with no experience?",
+        a: "Yes, but you have to substitute proof for a track record: a small portfolio, clear written communication, and evidence you can do the role's real tasks autonomously. Remote employers care most about self-direction and demonstrated ability.",
+      },
+      {
+        q: "Why is it so hard to get a remote job?",
+        a: "Remote roles get far more applicants than on-site ones, and the listings are polluted with scams. Standing out requires targeting remote-first employers and proving self-directed capability, not just applying widely.",
+      },
+    ],
+    sources: [],
+  },
+
+  {
+    slug: "ai-proof-jobs-2026",
+    category: "AI & work",
+    title: "AI-Proof Jobs in 2026: What's Actually Safe",
+    description:
+      "Which jobs are safe from AI in 2026? The honest answer isn't a list of titles — it's a set of traits. Here's what makes work durable, and how to move toward it.",
+    keywords: [
+      "AI proof jobs 2026",
+      "jobs safe from AI",
+      "AI resistant careers",
+      "future proof career",
+    ],
+    datePublished: "2026-06-21",
+    readingMins: 6,
+    dek: "The most AI-proof jobs in 2026 aren't defined by title but by traits: work that demands judgment under ambiguity, human trust and accountability, physical presence, or responsibility for outcomes when being wrong is costly. The durable move is shifting toward that work — and being able to prove you can do it.",
+    sections: [
+      {
+        heading: "Stop thinking in job titles",
+        body: [
+          "\"Is my job AI-proof?\" is the wrong question, because AI doesn't replace jobs — it replaces tasks. Almost every role is a bundle of tasks, some automatable and some not. The durable question is: how much of my work is the kind AI can't own?",
+        ],
+      },
+      {
+        heading: "The traits that make work durable",
+        body: ["Work tends to resist automation when it has these traits:"],
+        list: {
+          items: [
+            "Judgment under ambiguity — no clean inputs, real tradeoffs, context that isn't written down.",
+            "Accountability — someone has to own the outcome and answer for it being wrong.",
+            "Human trust — persuasion, care, negotiation, relationships.",
+            "Physical presence — hands-on work in the real world.",
+            "Novelty — problems that haven't been solved a thousand times before for the model to learn from.",
+          ],
+        },
+      },
+      {
+        heading: "Roles heavy in those traits",
+        body: [
+          "In 2026, the resilient roles cluster around skilled trades, healthcare and care work, complex sales and relationship roles, leadership and coordination, and the senior end of knowledge work where judgment and accountability dominate. Note the pattern: it's the judgment-and-trust end of every field, not a separate set of \"safe\" industries.",
+        ],
+      },
+      {
+        heading: "Become AI-adjacent, not AI-replaceable",
+        body: [
+          "You don't have to abandon your field. The move is to climb toward the judgment work within it and to use AI as leverage rather than competing with it. People who direct, audit, and build on top of AI are in demand precisely because someone still has to own the result.",
+        ],
+      },
+      {
+        heading: "Proof beats a safe-list",
+        body: [
+          "No title is permanently safe, so chasing a \"safe job\" list is a losing game. What's durable is being demonstrably good at the judgment-heavy work AI can't own. Being able to sit down with a realistic version of a role and show that judgment — which is what a FirstWeek simulation surfaces — is worth more than betting on any title.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What jobs are safe from AI in 2026?",
+        a: "No job is fully safe, but work heavy in judgment, accountability, human trust, physical presence, and novelty is most resilient — skilled trades, care work, complex sales, leadership, and the senior end of knowledge work.",
+      },
+      {
+        q: "How do I make my career AI-proof?",
+        a: "Shift toward the judgment-and-accountability parts of your field, use AI as leverage instead of competing with it, and be able to demonstrate the human judgment a role needs rather than just claim it.",
+      },
+      {
+        q: "Will AI replace all jobs eventually?",
+        a: "AI replaces tasks, not whole jobs, and work requiring judgment, trust, and accountability is far harder to automate. The realistic outcome is roles reshaping around the human parts, not disappearing wholesale.",
+      },
+    ],
+    sources: [
+      { label: "CBS News — AI layoffs and entry-level workers", url: "https://www.cbsnews.com/news/ai-layoffs-hiring-entry-level-workers/" },
+      { label: "Washington Monthly — How AI broke the entry-level job", url: "https://washingtonmonthly.com/2026/05/29/ai-entry-level-jobs-college-graduates/" },
+    ],
+  },
 ];
 
 export function getGuide(slug: string): Guide | undefined {

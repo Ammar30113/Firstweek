@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,6 +26,8 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "FirstWeek", description },
   applicationName: "FirstWeek",
   appleWebApp: { capable: true, title: "FirstWeek", statusBarStyle: "default" },
+  // Set GOOGLE_SITE_VERIFICATION in Vercel once you add the property in Search Console.
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
 };
 
 export const viewport: Viewport = {
@@ -88,6 +92,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </nav>
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
