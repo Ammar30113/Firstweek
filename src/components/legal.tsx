@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
-// Centralized legal details. TODO(founder): confirm these before launch —
-// contactEmail must be a monitored inbox (firstweekapp.vercel.app can't receive
-// mail), and jurisdiction/entity should match your real legal setup.
+// Centralized legal details. TODO(founder): set `jurisdiction` to your actual
+// governing-law location (country/state), and add a legal entity name if you
+// incorporate, before launch.
 export const LEGAL = {
   product: "FirstWeek",
   effectiveDate: "June 22, 2026",
-  contactEmail: "support@firstweek.app",
+  contactEmail: "supportfirstweek@gmail.com",
   jurisdiction: "the United States",
   siteUrl: "https://firstweekapp.vercel.app",
 };
