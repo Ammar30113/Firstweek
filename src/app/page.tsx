@@ -32,6 +32,7 @@ export default async function Landing() {
           <div className="aurora drift-slow left-[-8%] top-[-12%] h-[42rem] w-[42rem] bg-brand-600/30" />
           <div className="aurora drift-slower right-[-10%] top-[10%] h-[34rem] w-[34rem] bg-ember-500/20" />
           <div className="aurora drift-slow bottom-[-20%] left-[30%] h-[30rem] w-[30rem] bg-brand-800/30" />
+          <div className="aurora drift-slower right-[16%] bottom-[-22%] h-[26rem] w-[26rem] bg-cove-600/20" />
           <div className="absolute inset-0 grid-warm" />
         </div>
 
@@ -155,9 +156,9 @@ export default async function Landing() {
           </Reveal>
 
           <Reveal delay={160}>
-            <div className="flex h-full flex-col justify-center gap-2 rounded-3xl border border-stone-200/80 bg-stone-900 p-6 text-white">
+            <div className="flex h-full flex-col justify-center gap-2 rounded-3xl border border-cove-700 bg-cove-700 p-6 text-white">
               <span className="font-display text-xl font-semibold">Strengths + gaps</span>
-              <p className="text-sm text-stone-400">
+              <p className="text-sm text-white/75">
                 See exactly where you&apos;re strong, where you&apos;ll struggle, and how to prep — with evidence
                 from your own work.
               </p>
@@ -189,6 +190,7 @@ export default async function Landing() {
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="aurora drift-slow left-[20%] top-[-30%] h-[28rem] w-[28rem] bg-brand-600/30" />
           <div className="aurora drift-slower right-[10%] bottom-[-40%] h-[26rem] w-[26rem] bg-ember-500/20" />
+          <div className="aurora drift-slow left-[58%] top-[6%] h-[20rem] w-[20rem] bg-cove-600/15" />
         </div>
         <div className="relative z-10 mx-auto max-w-3xl px-5 py-20 text-center sm:py-24">
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-5xl">

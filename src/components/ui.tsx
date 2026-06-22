@@ -6,10 +6,7 @@ import Link from "next/link";
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={
-        "rounded-2xl border border-stone-200/70 bg-white p-5 shadow-[0_1px_2px_rgba(40,30,20,0.05),0_12px_32px_-20px_rgba(140,90,55,0.25)] " +
-        className
-      }
+      className={"rounded-2xl border border-stone-200/70 bg-white p-5 shadow-warm " + className}
     >
       {children}
     </div>
@@ -48,6 +45,7 @@ const TONES: Record<string, string> = {
   rose: "bg-rose-100 text-rose-700",
   amber: "bg-amber-100 text-amber-800",
   emerald: "bg-emerald-100 text-emerald-700",
+  cove: "bg-cove-100 text-cove-700",
 };
 
 export function Chip({ children, tone = "stone" }: { children: ReactNode; tone?: string }) {
@@ -88,11 +86,11 @@ export function Button({
   className = "",
 }: BtnProps) {
   const base =
-    "inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed";
+    "press inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed";
   const styles =
     variant === "primary"
-      ? "bg-brand-600 text-white shadow-sm hover:bg-brand-700"
-      : "border border-stone-300 text-stone-700 hover:bg-stone-100";
+      ? "bg-brand-600 text-white shadow-[0_6px_16px_-6px_rgba(200,71,42,0.6)] hover:bg-brand-500 hover:shadow-[0_10px_24px_-8px_rgba(200,71,42,0.78)]"
+      : "border border-stone-300 text-stone-700 hover:border-stone-400 hover:bg-stone-50";
   const cls = `${base} ${styles} ${className}`;
   if (href) {
     return (

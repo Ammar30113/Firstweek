@@ -31,6 +31,7 @@ export default function GuidesIndex() {
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="aurora drift-slow left-[10%] top-[-40%] h-[26rem] w-[26rem] bg-brand-600/30" />
           <div className="aurora drift-slower right-[5%] top-[-20%] h-[22rem] w-[22rem] bg-ember-500/20" />
+          <div className="aurora drift-slow right-[34%] bottom-[-30%] h-[18rem] w-[18rem] bg-cove-600/18" />
         </div>
         <div className="relative z-10 mx-auto max-w-5xl px-5 py-16">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-ember-300">Field guides</span>

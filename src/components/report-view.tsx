@@ -63,7 +63,7 @@ export function ReportView({
           <div className="flex-1 text-center sm:text-left">
             <div className="mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <Chip tone={tone}>{report.readiness_band}</Chip>
-              <Chip>Confidence: {report.confidence_level}</Chip>
+              <Chip tone="cove">Confidence: {report.confidence_level}</Chip>
             </div>
             <p className="font-display text-lg font-medium leading-relaxed text-stone-800">
               {report.application_recommendation}
@@ -138,7 +138,7 @@ export function ReportView({
             <H>Transferable skills</H>
             <ul className="space-y-3 text-sm text-stone-700">
               {report.transferable_skills.map((t, i) => (
-                <li key={i}>
+                <li key={i} className="border-l-2 border-cove-300 pl-3">
                   <span className="font-semibold text-stone-900">{t.skill}</span>
                   <div className="text-stone-500">{t.application_to_role}</div>
                 </li>

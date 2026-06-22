@@ -31,7 +31,7 @@ export default async function DashboardPage() {
 
       {rows.length === 0 ? (
         <Card className="flex flex-col items-center gap-3 py-14 text-center">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl">◎</span>
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-cove-100 text-2xl text-cove-600">◎</span>
           <p className="font-display text-lg font-semibold text-stone-900">No assessments yet</p>
           <p className="max-w-xs text-sm text-stone-500">
             Run your first simulation to see where you really stand on a role.

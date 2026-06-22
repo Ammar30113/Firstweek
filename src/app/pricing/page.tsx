@@ -41,6 +41,7 @@ export default async function PricingPage() {
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="aurora drift-slow left-[15%] top-[-40%] h-[26rem] w-[26rem] bg-brand-600/30" />
           <div className="aurora drift-slower right-[8%] top-[-20%] h-[20rem] w-[20rem] bg-ember-500/20" />
+          <div className="aurora drift-slow right-[30%] bottom-[-30%] h-[18rem] w-[18rem] bg-cove-600/18" />
         </div>
         <div className="relative z-10 mx-auto max-w-3xl px-5 py-16 text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-ember-300">Pricing</span>
