@@ -49,8 +49,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2.5">
-                <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-bold text-white shadow-[0_2px_8px_-2px_rgba(200,71,42,0.6)]">
-                  F
+                <span className="inline-flex h-7 w-7 flex-col overflow-hidden rounded-lg shadow-[0_2px_8px_-2px_rgba(200,71,42,0.6)]">
+                  <span className="block h-[8px] w-full bg-gradient-to-r from-ember-300 via-brand-400 to-brand-700" />
+                  <span className="flex flex-1 items-center justify-center bg-ink-900 font-display text-[13px] font-semibold text-cream-50">1</span>
                 </span>
                 <span className="font-display text-lg font-semibold tracking-tight text-stone-900">FirstWeek</span>
               </Link>
@@ -100,8 +101,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="mx-auto max-w-6xl px-5 py-10">
             <div className="flex flex-wrap items-center justify-between gap-5">
               <Link href="/" className="flex items-center gap-2.5">
-                <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-bold text-white">
-                  F
+                <span className="inline-flex h-6 w-6 flex-col overflow-hidden rounded-md">
+                  <span className="block h-[7px] w-full bg-gradient-to-r from-ember-300 via-brand-400 to-brand-700" />
+                  <span className="flex flex-1 items-center justify-center bg-ink-900 font-display text-[11px] font-semibold text-cream-50">1</span>
                 </span>
                 <span className="font-display text-base font-semibold tracking-tight text-stone-900">FirstWeek</span>
               </Link>
