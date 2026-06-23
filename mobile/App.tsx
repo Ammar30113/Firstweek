@@ -4,12 +4,12 @@ import {
   BackHandler,
   Linking,
   Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { WebView, type WebViewNavigation } from "react-native-webview";
 
@@ -23,7 +23,7 @@ const APP_HOST = "firstweekapp.vercel.app";
 const BRAND = "#c8472a";
 const BG = "#fafaf9";
 
-export default function App() {
+function Shell() {
   const webRef = useRef<WebView>(null);
   const canGoBack = useRef(false);
   const [loading, setLoading] = useState(true);
@@ -106,6 +106,14 @@ export default function App() {
         </>
       )}
     </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <Shell />
+    </SafeAreaProvider>
   );
 }
 
