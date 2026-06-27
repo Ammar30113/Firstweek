@@ -2,7 +2,7 @@
   "expo": {
     "name": "FirstWeek",
     "slug": "firstweek",
-    "owner": "ab3011",
+    "owner": "ab3011s-organization",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -40,7 +40,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "1760c19d-7e63-4110-abb9-1fe686d860ed"
+        "projectId": "a92247c5-7cc8-4ce7-9714-d2b9139e0a9e"
       }
     }
   }
