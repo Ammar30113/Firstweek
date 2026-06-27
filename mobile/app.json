@@ -25,6 +25,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "FirstWeek uses Face ID to lock the app so your résumé and assessments stay private."
+        }
+      ]
+    ]
   }
 }
