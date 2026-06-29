@@ -11,7 +11,10 @@
     "backgroundColor": "#fafaf9",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ab3011.firstweek"
+      "bundleIdentifier": "com.ab3011.firstweek",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.ab3011.firstweek",
