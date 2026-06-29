@@ -41,6 +41,29 @@ interface RcEvent {
   store?: string;
 }
 
+// RevenueCat doesn't always include expiration_at_ms on grant-type events
+// (UNCANCELLATION, PRODUCT_CHANGE, some RENEWAL shapes). Reconcile the entitlement
+// expiry from the v1 subscriber API so a renewing subscriber isn't wrongly lapsed.
+// Requires RC_SECRET_API_KEY; returns null if unset or on any error (caller logs).
+async function fetchEntitlementExpiry(appUserId: string): Promise<number | null> {
+  const key = process.env.RC_SECRET_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch(
+      `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(appUserId)}`,
+      { headers: { Authorization: `Bearer ${key}` } },
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    const iso = json?.subscriber?.entitlements?.pro?.expires_date;
+    if (!iso) return null;
+    const ms = new Date(iso).getTime();
+    return Number.isFinite(ms) ? ms : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req: Request) {
   if (!authOk(req.headers.get("authorization"))) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -66,19 +89,27 @@ export async function POST(req: Request) {
     // Grants require an expiry (our product is a subscription); clamp it so a
     // forged/replayed event can't grant near-permanent access. isPro also
     // requires a future expiry, so a missing one simply grants nothing.
-    if (GRANT.has(event.type) && event.expiration_at_ms) {
-      const expiresMs = Math.min(event.expiration_at_ms, Date.now() + MAX_GRANT_MS);
-      await admin.from("entitlements").upsert(
-        {
-          app_user_id: userId,
-          entitlement: "pro",
-          is_active: true,
-          expires_at: new Date(expiresMs).toISOString(),
-          store: event.store ?? null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "app_user_id,entitlement" },
-      );
+    if (GRANT.has(event.type)) {
+      // Prefer the event's expiry; fall back to the subscriber API when absent
+      // so renewals/uncancellations without expiration_at_ms still extend Pro.
+      const expMs = event.expiration_at_ms ?? (await fetchEntitlementExpiry(userId));
+      if (!expMs) {
+        // Don't silently drop a real grant — surface it for investigation.
+        console.warn("[revenuecat webhook] grant without resolvable expiry:", event.type, userId);
+      } else {
+        const expiresMs = Math.min(expMs, Date.now() + MAX_GRANT_MS);
+        await admin.from("entitlements").upsert(
+          {
+            app_user_id: userId,
+            entitlement: "pro",
+            is_active: true,
+            expires_at: new Date(expiresMs).toISOString(),
+            store: event.store ?? null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "app_user_id,entitlement" },
+        );
+      }
     } else if (REVOKE.has(event.type)) {
       await admin.from("entitlements").upsert(
         { app_user_id: userId, entitlement: "pro", is_active: false, updated_at: new Date().toISOString() },

@@ -23,7 +23,6 @@ const FREE_POINTS = [
 const PRO_POINTS = [
   "Unlimited simulations & reports",
   "Every role, every application",
-  "Import postings by URL",
   "Priority AI evaluation",
   "Your full assessment history",
 ];

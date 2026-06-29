@@ -32,6 +32,16 @@ export async function checkLimits(
   }
 
   // Global daily budget kill-switch.
+  return checkDailyBudget();
+}
+
+/**
+ * Global daily spend kill-switch: sum of ai_logs.cost_usd today vs. budget.
+ * Call this on EVERY route that spends on OpenAI (analyze + simulate + evaluate),
+ * not just assessment creation — otherwise the cap is bypassable by looping the
+ * later, more expensive stages. Fails open on a DB error (availability first).
+ */
+export async function checkDailyBudget(): Promise<LimitResult> {
   const dayStart = new Date();
   dayStart.setUTCHours(0, 0, 0, 0);
   const admin = createAdminClient();
@@ -48,6 +58,5 @@ export async function checkLimits(
       error: "FirstWeek is at capacity for today. Please try again tomorrow.",
     };
   }
-
   return { ok: true };
 }

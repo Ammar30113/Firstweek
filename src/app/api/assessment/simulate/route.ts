@@ -3,6 +3,7 @@ import { generateSimulation } from "@/lib/ai/stages";
 import { badRequest, serverError } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { aiContext } from "@/lib/ai/context";
+import { checkDailyBudget } from "@/lib/db/guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -16,15 +17,22 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
+    // Daily spend kill-switch — every OpenAI-spending route, not just analyze.
+    const budget = await checkDailyBudget();
+    if (!budget.ok) return NextResponse.json({ error: budget.error }, { status: budget.status });
+
     const { assessmentId } = await req.json();
     if (!assessmentId) return badRequest("assessmentId is required");
 
     const { data: assess, error: aErr } = await supabase
       .from("assessments")
-      .select("id, role_match_json, job_post_id, candidate_profile_id")
+      .select("id, status, role_match_json, job_post_id, candidate_profile_id")
       .eq("id", assessmentId)
       .single();
     if (aErr || !assess) return NextResponse.json({ error: "Assessment not found" }, { status: 404 });
+    // Block re-running the paid pipeline on a finished assessment (abuse guard).
+    if (assess.status === "completed")
+      return NextResponse.json({ error: "This assessment is already complete." }, { status: 409 });
 
     const { data: jobRow } = await supabase
       .from("job_posts")

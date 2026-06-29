@@ -10,6 +10,7 @@ import { scoreAssessment } from "@/lib/scoring";
 import { badRequest, serverError } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { aiContext } from "@/lib/ai/context";
+import { checkDailyBudget } from "@/lib/db/guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -23,6 +24,11 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
+    // Daily spend kill-switch — this is the expensive (gpt-4o) path, so it must
+    // be capped like analyze, not left open to unlimited re-runs.
+    const budget = await checkDailyBudget();
+    if (!budget.ok) return NextResponse.json({ error: budget.error }, { status: budget.status });
+
     const body = await req.json();
     const assessmentId = String(body.assessmentId || "");
     const responses: string[] = Array.isArray(body.responses)
@@ -32,10 +38,14 @@ export async function POST(req: Request) {
 
     const { data: assess, error: aErr } = await supabase
       .from("assessments")
-      .select("id, job_post_id, candidate_profile_id, role_match_json")
+      .select("id, status, job_post_id, candidate_profile_id, role_match_json")
       .eq("id", assessmentId)
       .single();
     if (aErr || !assess) return NextResponse.json({ error: "Assessment not found" }, { status: 404 });
+    // One paid evaluation per assessment — block looping eval+report on a
+    // finished assessment (the main cost-abuse vector).
+    if (assess.status === "completed")
+      return NextResponse.json({ error: "This assessment is already complete." }, { status: 409 });
 
     const { data: jobRow } = await supabase
       .from("job_posts")
