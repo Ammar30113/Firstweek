@@ -57,14 +57,28 @@ async function setUpNotifications() {
     }
     if (!granted) return;
     if ((await AsyncStorage.getItem(K_REMINDER)) === "1") return;
+    const DAY = 60 * 60 * 24;
+    // Two local-only nudges that drive the improvement loop: come back and
+    // practice a gap, then come back and tell us how the role went.
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Your first week is waiting",
-        body: "Pick up where you left off and prove you can do the job.",
+        title: "Close one gap today 💪",
+        body: "A focused 5-minute drill moves your readiness score. Pick a gap and get a rep in.",
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 60 * 60 * 24,
+        seconds: DAY,
+        repeats: false,
+      },
+    });
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "How did it go? 🎯",
+        body: "Heard back on a role you prepped for? Log it — track your wins and what to practice next.",
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: DAY * 3,
         repeats: false,
       },
     });

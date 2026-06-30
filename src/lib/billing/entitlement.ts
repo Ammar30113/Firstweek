@@ -8,6 +8,9 @@ import type { LimitResult } from "@/lib/db/guards";
 export const BILLING_ENABLED =
   !!process.env.NEXT_PUBLIC_RC_WEB_BILLING_KEY && !!process.env.RC_WEBHOOK_AUTH;
 export const FREE_ASSESSMENTS = Number(process.env.FREE_ASSESSMENTS || 1);
+// Free users get a TASTE of the improvement loop, then Pro for unlimited drills.
+// This is the real upsell: free = the diagnosis, Pro = getting better at it.
+export const FREE_DRILLS = Number(process.env.FREE_DRILLS || 3);
 
 // Pure entitlement check against the webhook-synced table. Throws on a DB error
 // (the caller fails open) so an infra problem never silently looks like "not Pro".
@@ -52,6 +55,35 @@ export async function checkPaywall(userId: string): Promise<LimitResult> {
     return { ok: true };
   } catch (e) {
     console.error("[checkPaywall]", e instanceof Error ? e.message : e);
+    return { ok: true }; // fail open
+  }
+}
+
+// Gate for generating a practice drill. No-op while billing is disabled. Pro is
+// unlimited; free users get FREE_DRILLS to taste the loop. Counts drills the user
+// actually STARTED (status-agnostic) so the count can't be reset by abandoning
+// one. Fails OPEN on any error — never lock a (possibly paying) user out.
+export async function checkDrillPaywall(userId: string): Promise<LimitResult> {
+  if (!BILLING_ENABLED) return { ok: true };
+  try {
+    if (await isPro(userId)) return { ok: true };
+
+    const { count, error } = await createAdminClient()
+      .from("drills")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId);
+    if (error) throw error;
+
+    if ((count ?? 0) >= FREE_DRILLS) {
+      return {
+        ok: false,
+        status: 402,
+        error: `You've used your ${FREE_DRILLS} free practice drills. Upgrade to Pro for unlimited practice.`,
+      };
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error("[checkDrillPaywall]", e instanceof Error ? e.message : e);
     return { ok: true }; // fail open
   }
 }

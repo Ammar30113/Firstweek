@@ -6,12 +6,16 @@ import {
   simulationSchema,
   evaluationSchema,
   reportSchema,
+  drillSchema,
+  drillEvaluationSchema,
   type JobAnalysis,
   type CandidateProfile,
   type RoleMatch,
   type SimulationTask,
   type Evaluation,
   type ReportBody,
+  type Drill,
+  type DrillEvaluation,
 } from "@/lib/schemas";
 
 const json = (v: unknown) => JSON.stringify(v, null, 2);
@@ -313,5 +317,85 @@ Confidence Level: ${input.confidenceLevel}`;
     schemaName: "readiness_report",
     temperature: 0.3,
     maxTokens: 8000,
+  });
+}
+
+/* ============================================ The Improvement Loop: Drills */
+
+// Generate a focused micro-drill that targets ONE competency the candidate is
+// weak on. Cheap (BASE_MODEL): a tight scenario, not a full simulation.
+export function generateDrill(input: {
+  competency: string;
+  roleContext?: string;
+  gapDetail?: string;
+}): Promise<Drill> {
+  const system = `You are an expert skills coach. Your task is to design ONE short, focused practice drill that targets a single competency the person needs to strengthen.
+
+Rules:
+- The drill must isolate and exercise the ONE competency named — not a broad assessment.
+- Use a realistic, specific micro-scenario the person would actually encounter on the job.
+- It must be completable in 5-10 minutes from general professional knowledge — no private data or tools required.
+- "What good looks like" should give concrete markers of a strong answer WITHOUT handing over the answer.
+- Keep it tight and motivating: this is reps, not an exam.`;
+
+  const user = `Design a focused practice drill for this competency.
+
+Competency to strengthen: ${input.competency}
+${input.roleContext ? `Target role context: ${input.roleContext}` : ""}
+${input.gapDetail ? `Why it's a gap / what to improve: ${input.gapDetail}` : ""}
+
+Generate exactly one drill that exercises this competency.`;
+
+  return callStructured({
+    step: "drill_generation",
+    system,
+    user,
+    schema: drillSchema,
+    schemaName: "practice_drill",
+    temperature: 0.6,
+    maxTokens: 1500,
+  });
+}
+
+// Evaluate a drill response for the single targeted competency. QUALITY_MODEL —
+// credible, specific coaching feedback is the value the user comes back for.
+export function evaluateDrill(input: {
+  drill: Drill;
+  response: string;
+}): Promise<DrillEvaluation> {
+  const system = `You are a fair, rigorous skills coach evaluating a single focused drill response.
+
+Rules:
+- Score the ONE targeted competency from 1 to 5, grounded in specific evidence from the response.
+- Do NOT invent or assume anything the person did not write.
+- Give partial credit — never round to extremes for a partial answer.
+- "What a stronger answer includes" must be concrete and immediately actionable so the next attempt is better.
+- Tone: a coach who wants them to improve — honest about misses, but never demoralizing.`;
+
+  const user = `Evaluate this drill response.
+
+Targeted competency: ${input.drill.focus_competency}
+
+Drill scenario:
+---
+${input.drill.scenario}
+---
+Instructions given: ${input.drill.instructions}
+What good looks like:
+${input.drill.what_good_looks_like.map((s) => `- ${s}`).join("\n")}
+
+Person's response:
+---
+${input.response}
+---`;
+
+  return callStructured({
+    step: "drill_evaluation",
+    system,
+    user,
+    schema: drillEvaluationSchema,
+    schemaName: "drill_evaluation",
+    temperature: 0.2,
+    maxTokens: 1200,
   });
 }

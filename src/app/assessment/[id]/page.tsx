@@ -28,6 +28,15 @@ export default async function AssessmentReportPage({
     .select("score, simulation_tasks(title, order_index)")
     .eq("assessment_id", id);
 
+  // Latest logged outcome for this role (drives the tracker's initial state).
+  const { data: outcomeRow } = await supabase
+    .from("outcomes")
+    .select("stage")
+    .eq("assessment_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const perTask = (evalRows ?? [])
     .map((e: { score: number | null; simulation_tasks: unknown }) => {
       const st = Array.isArray(e.simulation_tasks) ? e.simulation_tasks[0] : e.simulation_tasks;
@@ -48,7 +57,12 @@ export default async function AssessmentReportPage({
           ← Back to dashboard
         </Link>
       </div>
-      <ReportView report={report} perTask={perTask} />
+      <ReportView
+        report={report}
+        perTask={perTask}
+        assessmentId={id}
+        outcomeStage={outcomeRow?.stage ?? null}
+      />
     </div>
   );
 }

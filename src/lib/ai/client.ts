@@ -18,6 +18,9 @@ const STAGE_MODEL: Record<string, string> = {
   simulation_generation: BASE_MODEL,
   task_evaluation: QUALITY_MODEL,
   report_generation: QUALITY_MODEL,
+  // Improvement Loop: cheap to generate a drill, quality to coach the response.
+  drill_generation: BASE_MODEL,
+  drill_evaluation: QUALITY_MODEL,
 };
 
 export function modelForStep(step: string): string {

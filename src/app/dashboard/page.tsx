@@ -1,17 +1,72 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Chip, PageHeader, bandTone } from "@/components/ui";
+import { scoreTone } from "@/components/drill";
 
 export const dynamic = "force-dynamic";
 
+// Outcome display metadata + ranking (most advanced positive stage wins).
+const STAGE_META: Record<string, { label: string; tone: string; rank: number }> = {
+  applied: { label: "Applied", tone: "cove", rank: 1 },
+  interview: { label: "Interview", tone: "amber", rank: 2 },
+  offer: { label: "Offer", tone: "emerald", rank: 3 },
+  hired: { label: "Hired 🎉", tone: "emerald", rank: 4 },
+  rejected: { label: "Closed", tone: "stone", rank: 0 },
+  no_response: { label: "No response", tone: "stone", rank: 0 },
+};
+
+type DrillRow = { competency: string; score: number | null; created_at: string };
+
+// Collapse a competency's drills into a climb: first attempt → latest, best.
+function buildClimb(drills: DrillRow[]) {
+  const byComp = new Map<string, DrillRow[]>();
+  for (const d of drills) {
+    if (d.score == null) continue;
+    const arr = byComp.get(d.competency) ?? [];
+    arr.push(d);
+    byComp.set(d.competency, arr);
+  }
+  return [...byComp.entries()]
+    .map(([competency, rows]) => {
+      const sorted = rows.sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
+      const first = sorted[0].score!;
+      const latest = sorted[sorted.length - 1].score!;
+      const best = Math.max(...sorted.map((r) => r.score!));
+      const lastAt = +new Date(sorted[sorted.length - 1].created_at);
+      return { competency, attempts: sorted.length, first, latest, best, delta: latest - first, lastAt };
+    })
+    .sort((a, b) => b.lastAt - a.lastAt); // most recently practiced first
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: assessments, error } = await supabase
-    .from("assessments")
-    .select("id, job_title, status, overall_score, readiness_band, created_at")
-    .order("created_at", { ascending: false });
+  const [{ data: assessments, error }, { data: drills }, { data: outcomes }] = await Promise.all([
+    supabase
+      .from("assessments")
+      .select("id, job_title, status, overall_score, readiness_band, created_at")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("drills")
+      .select("competency, score, created_at")
+      .eq("status", "completed")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("outcomes")
+      .select("assessment_id, stage, created_at")
+      .order("created_at", { ascending: false }),
+  ]);
 
   const rows = assessments ?? [];
+  const climb = buildClimb(drills ?? []);
+
+  // Most advanced outcome stage per assessment.
+  const outcomeByAssessment = new Map<string, string>();
+  for (const o of outcomes ?? []) {
+    const cur = outcomeByAssessment.get(o.assessment_id);
+    if (!cur || (STAGE_META[o.stage]?.rank ?? 0) > (STAGE_META[cur]?.rank ?? 0)) {
+      outcomeByAssessment.set(o.assessment_id, o.stage);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10">
@@ -28,6 +83,47 @@ export default async function DashboardPage() {
           </Link>
         }
       />
+
+      {/* The climb — proof the practice is working. */}
+      {climb.length > 0 && (
+        <Card className="mb-6">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-stone-900">Your climb</h2>
+            <Chip tone="brand">{climb.reduce((s, c) => s + c.attempts, 0)} drills</Chip>
+          </div>
+          <div className="space-y-3">
+            {climb.map((c) => (
+              <div key={c.competency}>
+                <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                  <span className="truncate font-medium text-stone-800">{c.competency}</span>
+                  <span className="flex shrink-0 items-center gap-2 text-stone-500">
+                    {c.attempts > 1 && (
+                      <span className="tabular-nums">
+                        {c.first} <span className="text-stone-300">→</span>{" "}
+                        <span className="font-semibold text-stone-900">{c.latest}</span>
+                      </span>
+                    )}
+                    {c.attempts === 1 && <span className="tabular-nums font-semibold text-stone-900">{c.latest}</span>}
+                    {c.delta > 0 && <Chip tone="emerald">+{c.delta}</Chip>}
+                  </span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
+                  <div
+                    className={
+                      "h-full rounded-full transition-[width] duration-1000 " +
+                      (c.best >= 80 ? "bg-emerald-500" : c.best >= 60 ? "bg-brand-500" : c.best >= 40 ? "bg-amber-500" : "bg-rose-400")
+                    }
+                    style={{ width: `${Math.max(c.latest, 6)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-stone-400">
+            Practice a gap from any report to add reps. Every drill is one step closer to ready.
+          </p>
+        </Card>
+      )}
 
       {error ? (
         <Card className="flex flex-col items-center gap-3 py-14 text-center">
@@ -55,6 +151,8 @@ export default async function DashboardPage() {
         <div className="space-y-3">
           {rows.map((a) => {
             const done = a.status === "completed";
+            const outcome = outcomeByAssessment.get(a.id);
+            const om = outcome ? STAGE_META[outcome] : null;
             const card = (
               <Card className={done ? "transition hover:-translate-y-0.5 hover:border-brand-200" : ""}>
                 <div className="flex items-center justify-between gap-4">
@@ -65,6 +163,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
+                    {om && <Chip tone={om.tone}>{om.label}</Chip>}
                     {done ? (
                       <>
                         <span className="font-display text-3xl font-semibold tabular-nums text-stone-900">

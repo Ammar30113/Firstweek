@@ -213,6 +213,36 @@ export const reportSchema = z.object({
 });
 export type ReportBody = z.infer<typeof reportSchema>;
 
+/* ----------------------------------------------- The Improvement Loop: Drills */
+
+// A focused, single-competency practice generated from a report gap. Lighter and
+// cheaper than a full assessment: one generate call + one evaluate call.
+export const drillSchema = z.object({
+  focus_competency: z.string().describe("the single competency this drill targets"),
+  scenario: z
+    .string()
+    .describe("a tight, realistic micro-scenario the person would hit on the job, 2-4 sentences"),
+  instructions: z.string().describe("exactly what to produce; doable in 5-10 minutes"),
+  what_good_looks_like: z
+    .array(z.string())
+    .describe("3-5 concrete markers of a strong response, without giving away the answer"),
+  time_estimate_minutes: z.number().describe("realistic, 5-10"),
+});
+export type Drill = z.infer<typeof drillSchema>;
+
+// The LLM scores the ONE competency 1-5; code derives the 0-100 drill score.
+export const drillEvaluationSchema = z.object({
+  score_1_to_5: z.number().describe("integer 1-5 for this single competency"),
+  verdict: z.string().describe("one short headline on how they did"),
+  strengths: z.array(z.string()),
+  misses: z.array(z.string()),
+  what_stronger_answer_includes: z.array(z.string()),
+  feedback: z
+    .string()
+    .describe("2-3 sentences, honest but encouraging — a coach helping them improve next attempt"),
+});
+export type DrillEvaluation = z.infer<typeof drillEvaluationSchema>;
+
 // The score, band, confidence and disclaimer are NOT trusted to the model —
 // they are computed/fixed in code and merged in. This is the full report shape.
 export const MANDATORY_DISCLAIMER =

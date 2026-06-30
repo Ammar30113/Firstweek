@@ -219,7 +219,11 @@ export default function AssessmentPage() {
               View all assessments →
             </Link>
           </div>
-          <ReportView report={result.report} perTask={result.score.perTask} />
+          <ReportView
+            report={result.report}
+            perTask={result.score.perTask}
+            assessmentId={analysis?.assessmentId}
+          />
         </div>
       )}
     </div>

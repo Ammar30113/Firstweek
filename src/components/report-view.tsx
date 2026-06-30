@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { Report } from "@/lib/schemas";
 import { Card, Chip, H, impTone, bandTone } from "@/components/ui";
 import { ScoreGauge } from "@/components/visuals";
+import { PracticeButton } from "@/components/drill";
+import { OutcomeTracker } from "@/components/outcome-tracker";
 
 function sevTone(s: string) {
   if (s === "high") return "rose";
@@ -14,11 +16,17 @@ function sevTone(s: string) {
 export function ReportView({
   report,
   perTask,
+  assessmentId,
+  outcomeStage,
 }: {
   report: Report;
   perTask: { taskTitle: string; score: number }[];
+  // When present, the report becomes a launchpad: practice the gaps + track outcome.
+  assessmentId?: string;
+  outcomeStage?: string | null;
 }) {
   const tone = bandTone(report.readiness_band);
+  const roleContext = report.target_role_summary;
   const [copied, setCopied] = useState(false);
 
   function copySummary() {
@@ -71,6 +79,32 @@ export function ReportView({
           </div>
         </div>
       </Card>
+
+      {/* Improvement band — the score is a starting line, not a verdict. */}
+      {assessmentId && report.skill_gaps.length > 0 && (
+        <Card className="no-print border-brand-200 bg-gradient-to-br from-brand-50 to-cream-50">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-display text-lg font-semibold text-stone-900">
+                This score is your starting line — not your ceiling.
+              </p>
+              <p className="mt-0.5 text-sm text-stone-600">
+                Practice the gaps below in focused 5-minute drills and watch your readiness climb.
+              </p>
+            </div>
+            <PracticeButton
+              competency={report.skill_gaps[0].gap}
+              gapDetail={report.skill_gaps[0].recommendation}
+              roleContext={roleContext}
+              assessmentId={assessmentId}
+              source="skill_gap"
+              label="Start practicing →"
+              variant="primary"
+              className="shrink-0"
+            />
+          </div>
+        </Card>
+      )}
 
       {/* Context */}
       <div className="grid gap-5 md:grid-cols-2">
@@ -126,11 +160,24 @@ export function ReportView({
                 <span className="font-semibold text-stone-900">{g.gap}</span>{" "}
                 <Chip tone={impTone(g.importance_for_role)}>{g.importance_for_role}</Chip>
                 <div className="text-stone-500">{g.recommendation}</div>
+                {assessmentId && (
+                  <PracticeButton
+                    competency={g.gap}
+                    gapDetail={g.recommendation}
+                    roleContext={roleContext}
+                    assessmentId={assessmentId}
+                    source="skill_gap"
+                    className="no-print mt-1.5"
+                  />
+                )}
               </li>
             ))}
           </ul>
         </Card>
       </div>
+
+      {/* Did it actually work? — the outcome loop. */}
+      {assessmentId && <OutcomeTracker assessmentId={assessmentId} initialStage={outcomeStage} />}
 
       {(report.transferable_skills.length > 0 || report.risk_factors.length > 0) && (
         <div className="grid gap-5 md:grid-cols-2">
